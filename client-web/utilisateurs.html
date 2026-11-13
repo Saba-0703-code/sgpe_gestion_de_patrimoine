@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGPE — Gestion des Utilisateurs</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        :root { --primaire: #00a896; --foncee: #008080; --claire: #e6f7f5; --texte: #334443; --gris: #f4f6f6; --gris-fonce: #888; }
+        body { display: flex; min-height: 100vh; background: var(--gris); }
+        .sidebar { width: 260px; background: white; border-right: 1px solid #e0e0e0; padding: 20px 0; position: fixed; height: 100vh; }
+        .sidebar .logo { padding: 20px 25px; font-size: 22px; font-weight: bold; color: var(--foncee); border-bottom: 1px solid #eee; margin-bottom: 15px; }
+        .sidebar nav a { display: flex; align-items: center; padding: 14px 25px; color: var(--texte); text-decoration: none; }
+        .sidebar nav a.actif { background: var(--claire); color: var(--primaire); border-left: 4px solid var(--primaire); }
+        .sidebar nav a:hover:not(.actif) { background: #f0f0f0; }
+        .sidebar nav a span { margin-left: 10px; }
+        .contenu { flex: 1; margin-left: 260px; padding: 25px; }
+        .entete { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .entete h1 { font-size: 26px; color: var(--texte); }
+        .btn { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; text-decoration: none; display: inline-block; }
+        .btn-primaire { background: var(--primaire); color: white; }
+        .btn-primaire:hover { background: #009484; }
+        .btn-secondaire { background: #e0e0e0; color: var(--texte); }
+        .btn-sm { padding: 6px 12px; font-size: 13px; }
+        .btn-danger { background: #e53935; color: white; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal.ouvert { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 10px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-content h2 { font-size: 20px; margin-bottom: 20px; color: var(--texte); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { display: block; margin-bottom: 6px; color: var(--texte); font-weight: 500; font-size: 14px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primaire); }
+        .actions-modal { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+        .filtres { background: white; padding: 18px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .filtres input, .filtres select { padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 160px; }
+        .boite-tableau { background: white; padding: 20px; border-radius: 8px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        table th, table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        table th { background: #fafafa; color: #666; font-weight: 600; }
+        .role { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .role.admin { background: #e8f5e9; color: #2e7d32; }
+        .role.utilisateur { background: #e3f2fd; color: #1565c0; }
+        .role.lecteur { background: #f3e5f5; color: #7b1fa2; }
+        .statut { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .statut.actif { background: #e8f5e9; color: #2e7d32; }
+        .statut.inactif { background: #f5f5f5; color: #757575; }
+        .vide { text-align: center; padding: 40px; color: var(--gris-fonce); }
+        .utilisateur { display: flex; align-items: center; gap: 10px; }
+        .deconnexion { padding: 8px 16px; background: #e53935; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .fermer { float: right; background: none; border: none; font-size: 22px; cursor: pointer; color: #999; }
+        .avatar { width: 36px; height: 36px; background: var(--claire); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primaire); }
+        @media(max-width: 900px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo { font-size: 0; padding: 20px 5px; }
+            .sidebar nav a span { display: none; }
+            .contenu { margin-left: 70px; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">SGPE</div>
+        <nav>
+            <a href="dashboard.html">🏠 <span>Tableau de bord</span></a>
+            <a href="inventaire.html">📋 <span>Inventaire</span></a>
+            <a href="ajouter-bien.html">➕ <span>Ajouter un bien</span></a>
+            <a href="affectations.html">🔄 <span>Affectations</span></a>
+            <a href="utilisateurs.html" class="actif">👥 <span>Utilisateurs</span></a>
+            <a href="rapports.html">📊 <span>Rapports</span></a>
+        </nav>
+    </aside>
+
+    <main class="contenu">
+        <div class="entete">
+            <h1>Gestion des Utilisateurs</h1>
+            <div class="utilisateur">
+                <span id="nom-utilisateur">Admin</span>
+                <button class="deconnexion" onclick="deconnecter()">Déconnexion</button>
+            </div>
+        </div>
+
+        <div class="entete">
+            <button class="btn btn-primaire" onclick="ouvrirModal()">➕ Ajouter un utilisateur</button>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filtres">
+            <input type="text" id="recherche" placeholder="Rechercher un utilisateur...">
+            <select id="filtre-role">
+                <option value="">Tous les rôles</option>
+                <option value="admin">Administrateur</option>
+                <option value="utilisateur">Utilisateur</option>
+                <option value="lecteur">Lecteur</option>
+            </select>
+            <select id="filtre-statut">
+                <option value="">Tous statuts</option>
+                <option value="actif">Actif</option>
+                <option value="inactif">Inactif</option>
+            </select>
+        </div>
+
+        <!-- Tableau -->
+        <div class="boite-tableau">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Service/Département</th>
+                        <th>Statut</th>
+                        <th>Dernière connexion</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="corps-tableau">
+                    <tr><td colspan="7" class="vide">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal Formulaire -->
+    <div id="modal-utilisateur" class="modal">
+        <div class="modal-content">
+            <button class="fermer" onclick="fermerModal()">&times;</button>
+            <h2 id="modal-titre">Ajouter un utilisateur</h2>
+            <form id="form-utilisateur">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="prenom">Prénom *</label>
+                        <input type="text" id="prenom" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nom">Nom *</label>
+                        <input type="text" id="nom" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="email">Adresse email *</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Rôle *</label>
+                        <select id="role" required>
+                            <option value="">Choisir un rôle</option>
+                            <option value="admin">Administrateur</option>
+                            <option value="utilisateur">Utilisateur</option>
+                            <option value="lecteur">Lecteur</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="service">Service/Département</label>
+                        <input type="text" id="service">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="motdepasse">Mot de passe *</label>
+                        <input type="password" id="motdepasse" placeholder="Minimum 8 caractères" required>
+                    </div>
+                </div>
+                <div class="actions-modal">
+                    <button type="button" class="btn btn-secondaire" onclick="fermerModal()">Annuler</button>
+                    <button type="submit" class="btn btn-primaire">💾 Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:8000/service-admin/api";
+        let tousUtilisateurs = [];
+
+        function verifierConnexion() {
+            if (!localStorage.getItem('token')) {
+                window.location.href = 'login.html';
+            }
+            const u = JSON.parse(localStorage.getItem('utilisateur') || '{}');
+            document.getElementById('nom-utilisateur').textContent = u.prenom + ' ' + u.nom;
+        }
+
+        function deconnecter() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        function ouvrirModal() {
+            document.getElementById('modal-utilisateur').classList.add('ouvert');
+            document.getElementById('modal-titre').textContent = "Ajouter un utilisateur";
+            document.getElementById('form-utilisateur').reset();
+        }
+
+        function fermerModal() {
+            document.getElementById('modal-utilisateur').classList.remove('ouvert');
+            document.getElementById('form-utilisateur').reset();
+        }
+
+        function initiales(p, n) {
+            return (p.charAt(0) + n.charAt(0)).toUpperCase();
+        }
+
+        async function chargerUtilisateurs() {
+            tousUtilisateurs = [
+                { id: 1, prenom: 'Admin', nom: 'SGPE', email: 'admin@sgpe.tg', role: 'admin', service: 'Direction', statut: 'actif', derniereConnexion: "Aujourd'hui" },
+                { id: 2, prenom: 'Kouassi', nom: 'Yao', email: 'y.kouassi@sgpe.tg', role: 'utilisateur', service: 'Comptabilité', statut: 'actif', derniereConnexion: "Hier" },
+                { id: 3, prenom: 'Koné', nom: 'Aminata', email: 'a.kone@sgpe.tg', role: 'utilisateur', service: 'Ressources Humaines', statut: 'actif', derniereConnexion: "Il y a 3 jours" },
+                { id: 4, prenom: 'Traoré', nom: 'Moussa', email: 'm.traore@sgpe.tg', role: 'lecteur', service: 'Logistique', statut: 'inactif', derniereConnexion: "Il y a 2 mois" }
+            ];
+            afficherUtilisateurs(tousUtilisateurs);
+        }
+
+        function afficherUtilisateurs(liste) {
+            const tbody = document.getElementById('corps-tableau');
+            if (liste.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="vide">Aucun utilisateur ne correspond à votre recherche</td></tr>';
+                return;
+            }
+            tbody.innerHTML = liste.map(u => `
+                <tr>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div class="avatar">${initiales(u.prenom, u.nom)}</div>
+                            <div>
+                                <div style="font-weight:500;">${u.prenom} ${u.nom}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${u.email}</td>
+                    <td><span class="role ${u.role}">${u.role === 'admin' ? 'Administrateur' : u.role === 'utilisateur' ? 'Utilisateur' : 'Lecteur'}</span></td>
+                    <td>${u.service}</td>
+                    <td><span class="statut ${u.statut}">${u.statut === 'actif' ? 'Actif' : 'Inactif'}</span></td>
+                    <td style="font-size:13px;color:var(--gris-fonce);">${u.derniereConnexion}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondaire">✏️</button>
+                        <button class="btn btn-sm btn-danger">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filtrer() {
+            const recherche = document.getElementById('recherche').value.toLowerCase();
+            const role = document.getElementById('filtre-role').value;
+            const statut = document.getElementById('filtre-statut').value;
+            const filtre = tousUtilisateurs.filter(u => {
+                return (!recherche || u.prenom.toLowerCase().includes(recherche) || u.nom.toLowerCase().includes(recherche) || u.email.toLowerCase().includes(recherche))
+                    && (!role || u.role === role)
+                    && (!statut || u.statut === statut);
+            });
+            afficherUtilisateurs(filtre);
+        }
+
+        document.getElementById('form-utilisateur').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('✅ Utilisateur enregistré ! (Mode démo)');
+            fermerModal();
+        });
+
+        document.getElementById('recherche').addEventListener('input', filtrer);
+        document.getElementById('filtre-role').addEventListener('change', filtrer);
+        document.getElementById('filtre-statut').addEventListener('change', filtrer);
+
+        verifierConnexion();
+        chargerUtilisateurs();
+    </script>
+</body>
+</html>
