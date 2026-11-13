@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGPE — Fiche du Bien</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        :root { --primaire: #00a896; --foncee: #008080; --claire: #e6f7f5; --texte: #334443; --gris: #f4f6f6; --gris-fonce: #888; }
+        body { display: flex; min-height: 100vh; background: var(--gris); }
+        .sidebar { width: 260px; background: white; border-right: 1px solid #e0e0e0; padding: 20px 0; position: fixed; height: 100vh; }
+        .sidebar .logo { padding: 20px 25px; font-size: 22px; font-weight: bold; color: var(--foncee); border-bottom: 1px solid #eee; margin-bottom: 15px; }
+        .sidebar nav a { display: flex; align-items: center; padding: 14px 25px; color: var(--texte); text-decoration: none; }
+        .sidebar nav a.actif { background: var(--claire); color: var(--primaire); border-left: 4px solid var(--primaire); }
+        .sidebar nav a:hover:not(.actif) { background: #f0f0f0; }
+        .sidebar nav a span { margin-left: 10px; }
+        .contenu { flex: 1; margin-left: 260px; padding: 25px; }
+        .entete { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .entete h1 { font-size: 26px; color: var(--texte); }
+        .retour { color: var(--primaire); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 15px; }
+        .retour:hover { text-decoration: underline; }
+        .btn { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; text-decoration: none; display: inline-block; }
+        .btn-primaire { background: var(--primaire); color: white; }
+        .btn-primaire:hover { background: #009484; }
+        .btn-secondaire { background: #e0e0e0; color: var(--texte); }
+        .btn-danger { background: #e53935; color: white; }
+        .fiche-container { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; margin-bottom: 30px; }
+        .carte { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .carte h2 { font-size: 18px; color: var(--texte); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .photo-placeholder { background: var(--gris); border-radius: 8px; height: 200px; display: flex; align-items: center; justify-content: center; color: var(--gris-fonce); font-size: 48px; margin-bottom: 15px; }
+        .info-row { display: flex; padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
+        .info-label { width: 140px; font-weight: 500; color: var(--gris-fonce); }
+        .info-value { flex: 1; color: var(--texte); }
+        .etat { padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; display: inline-block; }
+        .etat.bon { background: #e8f5e9; color: #2e7d32; }
+        .etat.moyen { background: #fff8e1; color: #f57c00; }
+        .etat.mauvais { background: #ffebee; color: #c62828; }
+        .onglets { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 1px solid #ddd; }
+        .onglet { padding: 12px 25px; cursor: pointer; border-bottom: 3px solid transparent; color: var(--gris-fonce); }
+        .onglet.actif { border-bottom-color: var(--primaire); color: var(--primaire); font-weight: 600; }
+        .onglet-contenu { display: none; }
+        .onglet-contenu.actif { display: block; }
+        table { width: 100%; border-collapse: collapse; }
+        table th, table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        table th { background: #fafafa; color: #666; font-weight: 600; }
+        .vide { text-align: center; padding: 30px; color: var(--gris-fonce); }
+        .utilisateur { display: flex; align-items: center; gap: 10px; }
+        .deconnexion { padding: 8px 16px; background: #e53935; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        @media(max-width: 900px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo { font-size: 0; padding: 20px 5px; }
+            .sidebar nav a span { display: none; }
+            .contenu { margin-left: 70px; }
+            .fiche-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">SGPE</div>
+        <nav>
+            <a href="dashboard.html">🏠 <span>Tableau de bord</span></a>
+            <a href="inventaire.html">📋 <span>Inventaire</span></a>
+            <a href="ajouter-bien.html">➕ <span>Ajouter un bien</span></a>
+            <a href="affectations.html">🔄 <span>Affectations</span></a>
+            <a href="utilisateurs.html">👥 <span>Utilisateurs</span></a>
+            <a href="rapports.html">📊 <span>Rapports</span></a>
+        </nav>
+    </aside>
+
+    <main class="contenu">
+        <a href="inventaire.html" class="retour">← Retour à l'inventaire</a>
+        
+        <div class="entete">
+            <h1 id="titre-bien">EQ-024 — Ordinateur portable</h1>
+            <div>
+                <a href="ajouter-bien.html" class="btn btn-secondaire">✏️ Modifier</a>
+                <button class="btn btn-danger">🗑️ Supprimer</button>
+            </div>
+        </div>
+
+        <div class="fiche-container">
+            <!-- Colonne gauche : Photo & Infos principales -->
+            <div class="carte">
+                <h2>Photo</h2>
+                <div class="photo-placeholder">🖼️</div>
+                
+                <h2 style="margin-top: 25px;">Informations générales</h2>
+                <div class="info-row">
+                    <span class="info-label">Référence :</span>
+                    <span class="info-value" id="f-ref">EQ-024</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Nom :</span>
+                    <span class="info-value" id="f-nom">Ordinateur portable</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Catégorie :</span>
+                    <span class="info-value" id="f-cat">Matériel informatique</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">État :</span>
+                    <span class="info-value"><span class="etat bon" id="f-etat">Bon</span></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Valeur :</span>
+                    <span class="info-value" id="f-valeur">850 000 FCFA</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Acquis le :</span>
+                    <span class="info-value" id="f-date">15/03/2025</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Localisation :</span>
+                    <span class="info-value" id="f-loc">Bureau A10</span>
+                </div>
+            </div>
+
+            <!-- Colonne droite : Onglets détaillés -->
+            <div class="carte">
+                <div class="onglets">
+                    <div class="onglet actif" data-onglet="description">📝 Description</div>
+                    <div class="onglet" data-onglet="historique">📜 Historique</div>
+                    <div class="onglet" data-onglet="documents">📁 Documents</div>
+                </div>
+
+                <!-- Onglet Description -->
+                <div id="description" class="onglet-contenu actif">
+                    <h2>Description</h2>
+                    <p id="f-desc" style="line-height: 1.6; color: var(--texte);">
+                        Ordinateur portable de marque Dell, modèle Latitude 5420.<br>
+                        Processeur Intel Core i5, 16Go RAM, 512Go SSD.<br>
+                        Acheté neuf en mars 2025 pour les besoins du service financier.
+                    </p>
+                </div>
+
+                <!-- Onglet Historique -->
+                <div id="historique" class="onglet-contenu">
+                    <h2>Historique des mouvements</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Action</th>
+                                <th>Responsable</th>
+                                <th>Observation</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corps-historique">
+                            <tr>
+                                <td>15/03/2025</td>
+                                <td>✅ Enregistrement</td>
+                                <td>Admin SGPE</td>
+                                <td>Bien acquis neuf</td>
+                            </tr>
+                            <tr>
+                                <td>20/04/2025</td>
+                                <td>🔄 Affectation</td>
+                                <td>Admin SGPE</td>
+                                <td>Affecté à M. Kouassi — Bureau A10</td>
+                            </tr>
+                            <tr>
+                                <td>10/01/2026</td>
+                                <td>🔄 Réaffectation</td>
+                                <td>Admin SGPE</td>
+                                <td>Transféré au service comptabilité</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Onglet Documents -->
+                <div id="documents" class="onglet-contenu">
+                    <h2>Documents joints</h2>
+                    <div id="liste-docs">
+                        <p class="vide">Aucun document joint pour le moment</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function verifierConnexion() {
+            if (!localStorage.getItem('token')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Gestion des onglets
+        document.querySelectorAll('.onglet').forEach(onglet => {
+            onglet.addEventListener('click', function() {
+                document.querySelectorAll('.onglet').forEach(o => o.classList.remove('actif'));
+                document.querySelectorAll('.onglet-contenu').forEach(c => c.classList.remove('actif'));
+                
+                this.classList.add('actif');
+                document.getElementById(this.dataset.onglet).classList.add('actif');
+            });
+        });
+
+        verifierConnexion();
+    </script>
+</body>
+</html>
