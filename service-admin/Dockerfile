@@ -2,7 +2,6 @@ FROM php:8.4-fpm-alpine
 
 WORKDIR /var/www/html
 
-# Installation des dépendances système — avec curl-dev ajouté
 RUN apk update && apk add --no-cache \
     git \
     unzip \
@@ -14,7 +13,6 @@ RUN apk update && apk add --no-cache \
     libxml2-dev \
     postgresql-dev
 
-# Installation des extensions PHP — ctype retiré car intégré par défaut
 RUN docker-php-ext-install \
     bcmath \
     curl \
@@ -26,10 +24,8 @@ RUN docker-php-ext-install \
     xml \
     zip
 
-# Activation de l'opcache
 RUN docker-php-ext-enable opcache
 
-# Copie de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 EXPOSE 9000

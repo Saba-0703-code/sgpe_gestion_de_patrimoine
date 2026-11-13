@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGPE — Inventaire des Biens</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        :root {
+            --primaire: #00a896; --foncee: #008080; --claire: #e6f7f5;
+            --texte: #334443; --gris: #f4f6f6; --gris-fonce: #888;
+        }
+        body { display: flex; min-height: 100vh; background: var(--gris); }
+        .sidebar {
+            width: 260px; background: white; border-right: 1px solid #e0e0e0;
+            padding: 20px 0; position: fixed; height: 100vh;
+        }
+        .sidebar .logo {
+            padding: 20px 25px; font-size: 22px; font-weight: bold;
+            color: var(--foncee); border-bottom: 1px solid #eee; margin-bottom: 15px;
+        }
+        .sidebar nav a {
+            display: flex; align-items: center; padding: 14px 25px;
+            color: var(--texte); text-decoration: none; transition: background 0.2s;
+        }
+        .sidebar nav a.actif {
+            background: var(--claire); color: var(--primaire);
+            border-left: 4px solid var(--primaire);
+        }
+        .sidebar nav a:hover:not(.actif) { background: #f0f0f0; }
+        .sidebar nav a span { margin-left: 10px; }
+
+        .contenu { flex: 1; margin-left: 260px; padding: 25px; }
+        .entete {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px; flex-wrap: wrap; gap: 15px;
+        }
+        .entete h1 { font-size: 26px; color: var(--texte); }
+        .actions { display: flex; gap: 10px; }
+        .btn {
+            padding: 10px 18px; border-radius: 6px; border: none;
+            cursor: pointer; font-weight: 500; text-decoration: none; display: inline-block;
+        }
+        .btn-primaire { background: var(--primaire); color: white; }
+        .btn-primaire:hover { background: #009484; }
+        .btn-secondaire { background: #e0e0e0; color: var(--texte); }
+
+        .filtres {
+            background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; flex-wrap: wrap;
+        }
+        .filtres input, .filtres select {
+            padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px;
+            font-size: 14px; min-width: 180px;
+        }
+        .filtres input:focus, .filtres select:focus { outline: none; border-color: var(--primaire); }
+
+        .boite-tableau { background: white; padding: 20px; border-radius: 8px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        table th, table td {
+            padding: 14px 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px;
+        }
+        table th { background: #fafafa; color: #666; font-weight: 600; }
+        .etat {
+            padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+        }
+        .etat.bon { background: #e8f5e9; color: #2e7d32; }
+        .etat.moyen { background: #fff8e1; color: #f57c00; }
+        .etat.mauvais { background: #ffebee; color: #c62828; }
+        .actions-ligne a { margin-right: 8px; color: var(--primaire); text-decoration: none; font-size: 13px; }
+
+        .vide { text-align: center; padding: 40px; color: var(--gris-fonce); }
+        .utilisateur { display: flex; align-items: center; gap: 10px; }
+        .deconnexion {
+            padding: 8px 16px; background: #e53935; color: white;
+            border: none; border-radius: 6px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">SGPE
