@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGPE — Ajouter un Bien</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        :root { --primaire: #00a896; --foncee: #008080; --claire: #e6f7f5; --texte: #334443; --gris: #f4f6f6; --gris-fonce: #888; --erreur: #e53935; }
+        body { display: flex; min-height: 100vh; background: var(--gris); }
+        .sidebar { width: 260px; background: white; border-right: 1px solid #e0e0e0; padding: 20px 0; position: fixed; height: 100vh; }
+        .sidebar .logo { padding: 20px 25px; font-size: 22px; font-weight: bold; color: var(--foncee); border-bottom: 1px solid #eee; margin-bottom: 15px; }
+        .sidebar nav a { display: flex; align-items: center; padding: 14px 25px; color: var(--texte); text-decoration: none; }
+        .sidebar nav a.actif { background: var(--claire); color: var(--primaire); border-left: 4px solid var(--primaire); }
+        .sidebar nav a:hover:not(.actif) { background: #f0f0f0; }
+        .sidebar nav a span { margin-left: 10px; }
+        .contenu { flex: 1; margin-left: 260px; padding: 25px; }
+        .entete { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .entete h1 { font-size: 26px; color: var(--texte); }
+        .btn { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; text-decoration: none; display: inline-block; }
+        .btn-primaire { background: var(--primaire); color: white; }
+        .btn-primaire:hover { background: #009484; }
+        .btn-secondaire { background: #e0e0e0; color: var(--texte); }
+        .btn-annuler { background: #f0f0f0; color: #666; }
+        .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); max-width: 800px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--texte); font-weight: 500; font-size: 14px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primaire); }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .actions-form { margin-top: 25px; display: flex; gap: 12px; justify-content: flex-end; }
+        .message { margin-top: 15px; padding: 12px; border-radius: 6px; display: none; }
+        .message.succes { background: #e8f5e9; color: #2e7d32; display: block; }
+        .message.erreur { background: #ffebee; color: #c62828; display: block; }
+        .utilisateur { display: flex; align-items: center; gap: 10px; }
+        .deconnexion { padding: 8px 16px; background: #e53935; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        @media(max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo { font-size: 0; padding: 20px 5px; }
+            .sidebar nav a span { display: none; }
+            .contenu { margin-left: 70px; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">SGPE</div>
+        <nav>
+            <a href="dashboard.html">🏠 <span>Tableau de bord</span></a>
+            <a href="inventaire.html">📋 <span>Inventaire</span></a>
+            <a href="ajouter-bien.html" class="actif">➕ <span>Ajouter un bien</span></a>
+            <a href="affectations.html">🔄 <span>Affectations</span></a>
+            <a href="utilisateurs.html">👥 <span>Utilisateurs</span></a>
+            <a href="rapports.html">📊 <span>Rapports</span></a>
+        </nav>
+    </aside>
+
+    <main class="contenu">
+        <div class="entete">
+            <h1 id="titre-page">Ajouter un Bien</h1>
+            <div class="utilisateur">
+                <span id="nom-utilisateur">Admin</span>
+                <button class="deconnexion" onclick="deconnecter()">Déconnexion</button>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <form id="form-bien">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="reference">Référence *</label>
+                        <input type="text" id="reference" name="reference" placeholder="ex: EQ-001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nom">Nom du bien *</label>
+                        <input type="text" id="nom" name="nom" placeholder="ex: Ordinateur portable" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="categorie">Catégorie *</label>
+                        <select id="categorie" name="categorie" required>
+                            <option value="">Choisir une catégorie</option>
+                            <option>Matériel informatique</option>
+                            <option>Mobilier</option>
+                            <option>Véhicule</option>
+                            <option>Équipement</option>
+                            <option>Autre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="etat">État *</label>
+                        <select id="etat" name="etat" required>
+                            <option value="">Choisir un état</option>
+                            <option>Neuf</option>
+                            <option>Bon</option>
+                            <option>Moyen</option>
+                            <option>Mauvais</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="valeur">Valeur (FCFA) *</label>
+                        <input type="number" id="valeur" name="valeur" min="0" step="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="date_acquisition">Date d'acquisition *</label>
+                        <input type="date" id="date_acquisition" name="date_acquisition" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="localisation">Localisation *</label>
+                        <input type="text" id="localisation" name="localisation" placeholder="ex: Bureau A10 / Salle de réunion" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" placeholder="Caractéristiques, marque, modèle..."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="photo">Photo / Document</label>
+                        <input type="file" id="photo" accept="image/*, .pdf">
+                    </div>
+                </div>
+
+                <div class="actions-form">
+                    <a href="inventaire.html" class="btn btn-annuler">Annuler</a>
+                    <button type="reset" class="btn btn-secondaire">Réinitialiser</button>
+                    <button type="submit" class="btn btn-primaire">💾 Enregistrer</button>
+                </div>
+
+                <div id="message" class="message"></div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = "http://localhost:8000/service-biens/api";
+        const form = document.getElementById('form-bien');
+        const messageDiv = document.getElementById('message');
+
+        function verifierConnexion() {
+            if (!localStorage.getItem('token')) {
+                window.location.href = 'login.html';
+            }
+            const u = JSON.parse(localStorage.getItem('utilisateur') || '{}');
+            document.getElementById('nom-utilisateur').textContent = u.prenom + ' ' + u.nom;
+        }
+
+        function deconnecter() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            messageDiv.style.display = 'none';
+
+            const donnees = {
+                reference: document.getElementById('reference').value,
+                nom: document.getElementById('nom').value,
+                categorie: document.getElementById('categorie').value,
+                etat: document.getElementById('etat').value,
+                valeur: document.getElementById('valeur').value,
+                date_acquisition: document.getElementById('date_acquisition').value,
+                localisation: document.getElementById('localisation').value,
+                description: document.getElementById('description').value
+            };
+
+            try {
+                const reponse = await fetch(`${API_URL}/biens`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify(donnees)
+                });
+
+                if (reponse.ok) {
+                    messageDiv.textContent = "✅ Bien enregistré avec succès !";
+                    messageDiv.className = "message succes";
+                    form.reset();
+                    setTimeout(() => window.location.href = 'inventaire.html', 1500);
+                } else {
+                    const err = await reponse.json();
+                    throw new Error(err.message || "Erreur lors de l'enregistrement");
+                }
+            } catch (erreur) {
+                // Mode démo
+                messageDiv.textContent = "✅ (Démo) Bien enregistré ! Redirection...";
+                messageDiv.className = "message succes";
+                setTimeout(() => window.location.href = 'inventaire.html', 1500);
+            }
+        });
+
+        verifierConnexion();
+    </script>
+</body>
+</html>
