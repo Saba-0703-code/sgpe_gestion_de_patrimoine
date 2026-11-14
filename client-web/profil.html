@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil — SGPE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f0f4f8; min-height: 100vh; }
+        .header { background: #1e3a8a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.25rem; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 1.5rem; font-size: 0.95rem; }
+        .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: white; border-radius: 10px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { color: #1e3a8a; margin-bottom: 1.5rem; font-size: 1.4rem; }
+        .avatar-section { text-align: center; margin-bottom: 2rem; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; background: #bfdbfe; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #1e3a8a; margin: 0 auto 1rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #374151; font-size: 0.9rem; }
+        input, select, textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem; }
+        input:focus { outline: none; border-color: #1e3a8a; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-primary { background: #1e3a8a; color: white; }
+        .btn-primary:hover { background: #1e2d6b; }
+        .btn-secondary { background: #e5e7eb; color: #374151; margin-left: 0.75rem; }
+        .btn-secondary:hover { background: #d1d5db; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .info-text { color: #6b7280; font-size: 0.85rem; margin-top: 0.25rem; }
+        .separator { height: 1px; background: #e5e7eb; margin: 2rem 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏛️ SGPE — Gestion du Patrimoine</h1>
+        <div class="nav-links">
+            <a href="dashboard.html">Tableau de bord</a>
+            <a href="profil.html">Mon profil</a>
+            <a href="login.html">Déconnexion</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>Mon Profil</h2>
+
+            <div class="avatar-section">
+                <div class="avatar">👤</div>
+                <h3>Nom Utilisateur</h3>
+                <p style="color: #6b7280; font-size: 0.9rem;">Administrateur</p>
+            </div>
+
+            <form>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nom</label>
+                        <input type="text" value="DOE">
+                    </div>
+                    <div class="form-group">
+                        <label>Prénom</label>
+                        <input type="text" value="John">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Adresse email</label>
+                    <input type="email" value="admin@sgpe.tg">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Téléphone</label>
+                        <input type="tel" value="+228 XX XX XX XX">
+                    </div>
+                    <div class="form-group">
+                        <label>Service / Direction</label>
+                        <input type="text" value="Direction des Services Informatiques">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Profil / Rôle</label>
+                    <input type="text" value="Administrateur" readonly style="background: #f3f4f6;">
+                </div>
+
+                <div class="separator"></div>
+
+                <h3 style="font-size: 1rem; color: #374151; margin-bottom: 1rem;">Changer mon mot de passe</h3>
+                
+                <div class="form-group">
+                    <label>Mot de passe actuel</label>
+                    <input type="password" placeholder="••••••••">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nouveau mot de passe</label>
+                        <input type="password" placeholder="Au moins 8 caractères">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmer le mot de passe</label>
+                        <input type="password" placeholder="Répéter le mot de passe">
+                    </div>
+                </div>
+
+                <div style="text-align: right; margin-top: 1.5rem;">
+                    <a href="dashboard.html" class="btn btn-secondary">Annuler</a>
+                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

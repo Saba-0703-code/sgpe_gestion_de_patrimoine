@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paramètres — SGPE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f0f4f8; min-height: 100vh; }
+        .header { background: #1e3a8a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.25rem; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 1.5rem; font-size: 0.95rem; }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 1.5rem; }
+        .card h2 { color: #1e3a8a; margin-bottom: 1.2rem; font-size: 1.15rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.4rem; font-weight: 500; color: #374151; font-size: 0.88rem; }
+        input, select, textarea { width: 100%; padding: 0.65rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; }
+        input:focus, select:focus { outline: none; border-color: #1e3a8a; }
+        .btn { padding: 0.65rem 1.25rem; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-primary { background: #1e3a8a; color: white; }
+        .btn-primary:hover { background: #1e2d6b; }
+        .btn-success { background: #16a34a; color: white; }
+        .btn-success:hover { background: #15803d; }
+        .btn-warning { background: #f59e0b; color: #1f2937; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; }
+        .toggle-label { font-weight: 500; color: #1f2937; }
+        .toggle-desc { font-size: 0.8rem; color: #6b7280; margin-top: 0.2rem; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 24px; transition: 0.3s; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: 0.3s; }
+        input:checked + .slider { background-color: #1e3a8a; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        .btn-group { margin-top: 1rem; text-align: right; }
+        .info-box { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 0.75rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.85rem; color: #1e40af; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏛️ SGPE — Gestion du Patrimoine</h1>
+        <div class="nav-links">
+            <a href="dashboard.html">Tableau de bord</a>
+            <a href="utilisateurs.html">Utilisateurs</a>
+            <a href="parametres.html">Paramètres</a>
+            <a href="login.html">Déconnexion</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="info-box">
+            ⚙️ Ces paramètres influencent le fonctionnement global de l'application. Seuls les administrateurs peuvent les modifier.
+        </div>
+
+        <!-- Section 1 : Informations générales -->
+        <div class="card">
+            <h2>🏢 Informations de l'organisation</h2>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Nom de l'organisation</label>
+                    <input type="text" value="Ministère de l'Économie et des Finances">
+                </div>
+                <div class="form-group">
+                    <label>Sigle</label>
+                    <input type="text" value="MEF">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Adresse complète</label>
+                <input type="text" value="Boulevard du 13 Janvier, Lomé — Togo">
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Email de contact</label>
+                    <input type="email" value="contact@mef.gouv.tg">
+                </div>
+                <div class="form-group">
+                    <label>Téléphone</label>
+                    <input type="text" value="+228 22 22 22 22">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2 : Paramètres système -->
+        <div class="card">
+            <h2>🔧 Paramètres système</h2>
+            
+            <div class="toggle-row">
+                <div>
+                    <div class="toggle-label">Activer les notifications par email</div>
+                    <div class="toggle-desc">Envoyer un email pour les alertes et rappels importants</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <div>
+                    <div class="toggle-label">Verrouillage automatique de session</div>
+                    <div class="toggle-desc">Déconnexion après 30 minutes d'inactivité</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <div>
+                    <div class="toggle-label">Mode maintenance</div>
+                    <div class="toggle-desc">Bloque l'accès aux utilisateurs pendant les mises à jour</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <div>
+                    <div class="toggle-label">Journalisation détaillée</div>
+                    <div class="toggle-desc">Enregistrer toutes les actions des utilisateurs dans les logs</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+                <label>Durée de conservation des historiques (mois)</label>
+                <select>
+                    <option>6 mois</option>
+                    <option>12 mois</option>
+                    <option selected>24 mois</option>
+                    <option>36 mois</option>
+                    <option>Indéfinie</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Section 3 : Sauvegarde et maintenance -->
+        <div class="card">
+            <h2>💾 Sauvegarde et maintenance</h2>
+            
+            <div class="form-group">
+                <label>Fréquence des sauvegardes automatiques</label>
+                <select>
+                    <option>Quotidienne</option>
+                    <option selected>Hebdomadaire</option>
+                    <option>Mensuelle</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                <button class="btn btn-success">📤 Exporter toutes les données</button>
+                <button class="btn btn-warning">💾 Lancer une sauvegarde maintenant</button>
+                <button class="btn btn-danger">🗑️ Nettoyer les anciennes données</button>
+            </div>
+        </div>
+
+        <!-- Section 4 : Informations techniques -->
+        <div class="card">
+            <h2>ℹ️ Informations système</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
+                <div><strong>Version de l'application :</strong> 1.0.0</div>
+                <div><strong>Dernière mise à jour :</strong> 14/11/2026</div>
+                <div><strong>Base de données :</strong> PostgreSQL 17</div>
+                <div><strong>Environnement :</strong> Développement</div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <a href="dashboard.html" class="btn btn-secondary" style="background: #e5e7eb; color: #374151;">Annuler — Retour</a>
+            <button class="btn btn-primary">💾 Enregistrer les paramètres</button>
+        </div>
+    </div>
+</body>
+</html>
