@@ -1,0 +1,132 @@
+<style>
+    .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        color: white;
+    }
+    .bg-success { background: #10b981; }
+    .bg-primary { background: #3b82f6; }
+    .bg-warning { background: #f59e0b; }
+    .bg-danger { background: #ef4444; }
+    
+    .btn {
+        padding: 6px 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 0 2px;
+        font-size: 14px;
+    }
+    .btn-info { background: #06b6d4; color: white; }
+    .btn-warning { background: #f59e0b; color: #1f2937; }
+    .btn-danger { background: #ef4444; color: white; }
+</style>
+
+<!-- Avant la fin </body> -->
+<script type="module">
+    import ApiClient from './js/api.js';
+    const api = new ApiClient('biens');
+
+    let biens = [];
+
+    async function chargerBiens() {
+        const searchInput = document.getElementById('search');
+        const params = {};
+        if (searchInput?.value) params.search = searchInput.value;
+        
+        const result = await api.get('/biens', params);
+        if (result.success) {
+            biens = result.data.data || result.data;
+            afficherBiens();
+        } else {
+            console.error('Erreur chargement biens:', result.message);
+        }
+    }
+
+    function afficherBiens() {
+        const tbody = document.querySelector('#table-biens tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        
+        if (biens.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:#6b7280;">Aucun bien enregistré</td></tr>';
+            return;
+        }
+        
+        biens.forEach(b => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${b.id}</td>
+                <td>${b.designation || '-'}</td>
+                <td>${b.categorie || '-'}</td>
+                <td>${b.marque || '-'} ${b.modele || ''}</td>
+                <td>${b.numero_serie || '-'}</td>
+                <td>${b.date_achat || '-'}</td>
+                <td>${b.valeur ? Number(b.valeur).toLocaleString('fr-FR') + ' FCFA' : '-'}</td>
+                <td>
+                    <span class="badge ${
+                        b.etat === 'Neuf' ? 'bg-success' :
+                        b.etat === 'Bon' ? 'bg-primary' :
+                        b.etat === 'Moyen' ? 'bg-warning' : 'bg-danger'
+                    }">${b.etat || '-'}</span>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-info btn-voir" data-id="${b.id}">👁️</button>
+                    <button class="btn btn-sm btn-warning btn-modifier" data-id="${b.id}">✏️</button>
+                    <button class="btn btn-sm btn-danger btn-supprimer" data-id="${b.id}">🗑️</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Attacher les événements
+        document.querySelectorAll('.btn-voir').forEach(btn => {
+            btn.addEventListener('click', (e) => voirBien(e.target.dataset.id));
+        });
+        document.querySelectorAll('.btn-modifier').forEach(btn => {
+            btn.addEventListener('click', (e) => modifierBien(e.target.dataset.id));
+        });
+        document.querySelectorAll('.btn-supprimer').forEach(btn => {
+            btn.addEventListener('click', (e) => supprimerBien(e.target.dataset.id));
+        });
+    }
+
+    function voirBien(id) {
+        window.location.href = `bien-detail.html?id=${id}`;
+    }
+
+    function modifierBien(id) {
+        window.location.href = `bien-detail.html?id=${id}&edit=1`;
+    }
+
+    async function supprimerBien(id) {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer ce bien ?')) return;
+        
+        const result = await api.delete(`/biens/${id}`);
+        if (result.success) {
+            alert('✅ Bien supprimé avec succès');
+            chargerBiens();
+        } else {
+            alert(`❌ ${result.message || 'Erreur lors de la suppression'}`);
+        }
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    // Événements
+    document.getElementById('search')?.addEventListener('input', debounce(chargerBiens, 300));
+    
+    document.getElementById('btn-ajouter')?.addEventListener('click', () => {
+        window.location.href = 'bien-detail.html?new=1';
+    });
+
+    // Au chargement
+    document.addEventListener('DOMContentLoaded', chargerBiens);
+</script>

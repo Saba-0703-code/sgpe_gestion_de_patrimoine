@@ -10,15 +10,18 @@ return new class extends Migration
     {
         Schema::create('biens', function (Blueprint $table) {
             $table->id();
-            $table->string('reference')->unique();
-            $table->string('nom');
+            $table->string('designation');
             $table->text('description')->nullable();
             $table->string('categorie');
-            $table->string('etat');
-            $table->decimal('valeur', 14, 2);
-            $table->date('date_acquisition');
-            $table->string('localisation');
-            $table->string('photo')->nullable();
+            $table->string('marque')->nullable();
+            $table->string('modele')->nullable();
+            $table->string('numero_serie')->nullable()->unique();
+            $table->date('date_achat')->nullable();
+            $table->decimal('valeur', 15, 2)->default(0);
+            $table->enum('etat', ['Neuf', 'Bon', 'Moyen', 'Dégradé', 'Hors service'])->default('Bon');
+            $table->string('emplacement')->nullable();
+            $table->string('responsable')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }
