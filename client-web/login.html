@@ -22,22 +22,23 @@
             overflow: hidden;
         }
 
-        /* 🌍 Illustration gauche */
+                /* 🌍 Illustration gauche */
         .illustration {
             position: absolute;
             left: 0;
             top: 0;
-            width: 50%;
+            width: 55%;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #E6F7F4 0%, #F0F9F7 100%);
+            background: linear-gradient(to right, #F8FAFC 0%, #FFFFFF 100%);
         }
 
-        .illustration-content {
-            text-align: center;
-            color: #00C4A7;
+        .illustration img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
         }
 
         .globe {
@@ -175,12 +176,11 @@
 <body>
 
     <!-- 🌍 Partie gauche : Illustration -->
+        <!-- 🌍 Partie gauche : Illustration -->
     <div class="illustration">
-        <div class="illustration-content">
-            <div class="globe">🌍</div>
-            <h2>Système de Gestion<br>du Patrimoine de l'État</h2>
-        </div>
+        <img src="assets/illustration-connexion.png" alt="SGPE — Système de Gestion du Patrimoine de l'État">
     </div>
+
 
     <!-- 🔐 Partie droite : Formulaire de connexion -->
     <div class="login-container">
