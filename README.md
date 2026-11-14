@@ -1,7 +1,7 @@
 # 🏛️ SGPE — Système de Gestion du Patrimoine de l'État
 
 > **Application web de gestion centralisée du patrimoine de l'État**
->
+> ** Accès à la plateforme : https://sgpe-gestion-de-patrimoine.onrender.com**
 > Architecture microservices • Laravel 12 / PHP 8.4 • PostgreSQL • Docker
 
 ---
@@ -166,6 +166,14 @@ docker-compose exec service-admin php artisan migrate
 
 - 🌐 **Interface web** : [http://localhost:8080](http://localhost:8080)
 - 🔌 **API Gateway** : [http://localhost:8000](http://localhost:8000)
+
+---
+## 🌐 Accès à la plateforme
+
+| Environnement | Lien |
+|---|---|
+| 🚀 **En ligne (Render)** | **https://sgpe-gestion-de-patrimoine.onrender.com** |
+| 💻 En local | http://localhost:8080 |
 
 ---
 
