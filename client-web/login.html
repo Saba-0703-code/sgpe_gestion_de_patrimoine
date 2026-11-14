@@ -5,100 +5,207 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion — SGPE</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+        }
+
         body {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            background: #FFFFFF;
+            position: relative;
+            overflow: hidden;
         }
-        .login-card {
-            background: white;
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 400px;
+
+        /* 🌍 Illustration gauche */
+        .illustration {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #E6F7F4 0%, #F0F9F7 100%);
         }
-        .login-card h1 {
+
+        .illustration-content {
             text-align: center;
-            color: #1e3a5f;
-            margin-bottom: 8px;
+            color: #00C4A7;
+        }
+
+        .globe {
+            font-size: 120px;
+            margin-bottom: 20px;
+        }
+
+        .illustration-content h2 {
             font-size: 24px;
+            font-weight: 600;
+            color: #0F766E;
         }
-        .login-card p {
+
+        /* 📦 Carte de connexion droite */
+        .login-container {
+            position: absolute;
+            right: 8%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 48px 36px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-section {
             text-align: center;
-            color: #6b7280;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
         }
-        .form-group { margin-bottom: 20px; }
+
+        .logo-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .logo-section h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0F766E;
+            letter-spacing: 1px;
+        }
+
+        .login-card h2 {
+            text-align: center;
+            font-size: 22px;
+            color: #1E293B;
+            margin-bottom: 8px;
+        }
+
+        .sous-titre {
+            text-align: center;
+            color: #64748B;
+            font-size: 15px;
+            margin-bottom: 36px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #374151;
+            color: #334155;
+            font-size: 14px;
             font-weight: 500;
         }
+
         .form-group input {
             width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
+            padding: 12px 16px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
             font-size: 15px;
             transition: border 0.2s;
         }
+
         .form-group input:focus {
             outline: none;
-            border-color: #2c5282;
+            border-color: #00C4A7;
+            box-shadow: 0 0 0 3px rgba(0, 196, 167, 0.1);
         }
-        button {
+
+        .btn-connexion {
             width: 100%;
-            padding: 13px;
-            background: #1e3a5f;
-            color: white;
+            padding: 14px;
+            background: #00C4A7;
+            color: #FFFFFF;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
         }
-        button:hover { background: #2c5282; }
-        button:disabled { background: #9ca3af; cursor: not-allowed; }
+
+        .btn-connexion:hover {
+            background: #0F766E;
+        }
+
         .alert {
             padding: 12px;
             border-radius: 6px;
             margin-bottom: 20px;
             display: none;
         }
-        .alert.error { background: #fee2e2; color: #dc2626; display: block; }
-        .logo { text-align: center; margin-bottom: 20px; }
-        .logo span {
-            font-size: 32px;
-            font-weight: bold;
-            color: #1e3a5f;
+
+        .alert.error {
+            background: #FEF2F2;
+            color: #DC2626;
+            display: block;
+        }
+
+        /* 📱 Responsive */
+        @media (max-width: 900px) {
+            .illustration {
+                display: none;
+            }
+            .login-container {
+                position: static;
+                transform: none;
+                padding: 20px;
+                max-width: 420px;
+                margin: 0 auto;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <div class="logo"><span>🏛️ SGPE</span></div>
-        <h1>Bienvenue</h1>
-        <p>Connectez-vous pour accéder au système</p>
-        
-        <div id="alert" class="alert"></div>
-        
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="email">Adresse email</label>
-                <input type="email" id="email" name="email" required>
+
+    <!-- 🌍 Partie gauche : Illustration -->
+    <div class="illustration">
+        <div class="illustration-content">
+            <div class="globe">🌍</div>
+            <h2>Système de Gestion<br>du Patrimoine de l'État</h2>
+        </div>
+    </div>
+
+    <!-- 🔐 Partie droite : Formulaire de connexion -->
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo-section">
+                <div class="logo-icon">🏛️</div>
+                <h1>SGPE</h1>
             </div>
-            <div class="form-group">
-                <label for="password">Mot de passe</label>
-                <input type="password" id="password" name="mot_de_passe" required>
-            </div>
-            <button type="submit" id="submitBtn">Se connecter</button>
-        </form>
+            <h2>Bienvenue</h2>
+            <p class="sous-titre">Connectez-vous pour accéder au système</p>
+
+            <div id="alert" class="alert"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Adresse email</label>
+                    <input type="email" id="email" name="email" required placeholder="votre@email.tg">
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="mot_de_passe" required placeholder="••••••••">
+                </div>
+                <button type="submit" id="submitBtn" class="btn-connexion">Se connecter</button>
+            </form>
+        </div>
     </div>
 
     <script type="module">
