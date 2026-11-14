@@ -169,7 +169,7 @@
     </div>
 
     <script>
-        const API_URL = "http://localhost:8000/service-gestion/api";
+        const API_URL = "http://localhost:8000//api";
         let toutesAffectations = [];
 
         function verifierConnexion() {
@@ -193,16 +193,14 @@
             document.getElementById('modal-affectation').classList.remove('ouvert');
             document.getElementById('form-affectation').reset();
         }
+        
 
-        async function chargerAffectations() {
-            toutesAffectations = [
-                { ref: 'EQ-024', bien: 'Ordinateur portable', resp: 'M. Kouassi', service: 'Comptabilité', dateAff: '15/03/2025', statut: 'en-cours' },
-                { ref: 'VE-007', bien: 'Véhicule de service', resp: 'M. Traoré', service: 'Logistique', dateAff: '01/02/2025', dateRet: '31/12/2025', statut: 'en-cours' },
-                { ref: 'MB-018', bien: 'Table de réunion', resp: 'Service Généraux', service: 'Administration', dateAff: '10/01/2024', dateRet: '15/06/2025', statut: 'retourne' },
-                { ref: 'IM-003', bien: 'Imprimante salle B', resp: 'Mme Koné', service: 'Informatique', dateAff: '05/09/2024', statut: 'perdu' }
-            ];
-            afficherAffectations(toutesAffectations);
+        async function chargerBiens() {
+             const reponse = await fetch(`${API_URL}/biens`);
+             const biens = await reponse.json();
+            console.log(biens);
         }
+
 
         function afficherAffectations(liste) {
             const tbody = document.getElementById('corps-tableau');

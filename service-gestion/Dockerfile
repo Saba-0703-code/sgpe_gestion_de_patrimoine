@@ -1,36 +1,56 @@
+# Utilisation de l'image officielle PHP 8.4 avec FPM
 FROM php:8.4-fpm-alpine
 
-WORKDIR /var/www/html
+# Informations sur le mainteneur
+LABEL maintainer="SGPE Team"
+LABEL description="Microservice SGPE — PHP 8.4 / Laravel 12"
 
-# Installation des dépendances système — avec curl-dev ajouté
+# Mise à jour des paquets et installation des dépendances système
 RUN apk update && apk add --no-cache \
-    git \
-    unzip \
-    curl \
+    postgresql-dev \
     curl-dev \
     libzip-dev \
     libpng-dev \
     oniguruma-dev \
-    libxml2-dev \
-    postgresql-dev
+    bash \
+    git \
+    unzip
 
-# Installation des extensions PHP — ctype retiré car intégré par défaut
-RUN docker-php-ext-install \
-    bcmath \
-    curl \
-    dom \
-    fileinfo \
-    mbstring \
-    opcache \
+# Installation des extensions PHP
+RUN docker-php-ext-install pdo \
     pdo_pgsql \
-    xml \
-    zip
+    curl \
+    zip \
+    gd \
+    mbstring \
+    bcmath \
+    opcache
 
-# Activation de l'opcache
-RUN docker-php-ext-enable opcache
+# Configuration de PHP
+RUN cp /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
-# Copie de Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Définition du répertoire de travail
+WORKDIR /var/www/html
 
+# Copie des fichiers de l'application
+COPY . .
+
+# Installation des dépendances Composer (si vendor est absent)
+RUN if [ ! -d "vendor" ]; then \
+        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer; \
+        composer install --no-dev --optimize-autoloader --no-scripts; \
+    fi
+
+# Permissions
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache && \
+    chown -R www-data:www-data /var/www/html
+
+# Vérification de la santé du conteneur
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost/ping || exit 1
+
+# Exposition du port FPM
 EXPOSE 9000
-CMD ["php", "-S", "0.0.0.0:9000", "-t", "/var/www/html/public"]
+
+# Démarrage de PHP-FPM (commande par défaut de l'image, ne pas la surcharger)
+CMD ["php-fpm"]

@@ -10,7 +10,12 @@ class Affectation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'bien_id', 'nom_responsable', 'service_departement',
-        'motif', 'date_affectation', 'date_retour', 'statut'
+        'bien_id', 'nom_bien', 'service_destinataire', 'responsable',
+        'date_affectation', 'date_fin', 'motif', 'etat'
+    ];
+
+    protected $casts = [
+        'date_affectation' => 'date',
+        'date_fin' => 'date',
     ];
 }
