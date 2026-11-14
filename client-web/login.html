@@ -3,213 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGPE — Connexion</title>
+    <title>Connexion — SGPE</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body {
-            background: linear-gradient(135deg, #00a896 0%, #008080 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
         }
-
         .login-card {
             background: white;
-            padding: 45px 35px;
-            border-radius: 14px;
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.18);
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
         }
-
-        .logo-section {
+        .login-card h1 {
             text-align: center;
-            margin-bottom: 35px;
+            color: #1e3a5f;
+            margin-bottom: 8px;
+            font-size: 24px;
         }
-
-        .logo-section h1 {
-            color: #008080;
-            font-size: 26px;
-            margin-bottom: 5px;
+        .login-card p {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 30px;
         }
-
-        .logo-section p {
-            color: #777;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 22px;
-        }
-
+        .form-group { margin-bottom: 20px; }
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #334443;
+            color: #374151;
             font-weight: 500;
-            font-size: 15px;
         }
-
         .form-group input {
             width: 100%;
-            padding: 13px 15px;
-            border: 1px solid #ddd;
-            border-radius: 7px;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
             font-size: 15px;
-            transition: border-color 0.3s;
+            transition: border 0.2s;
         }
-
         .form-group input:focus {
             outline: none;
-            border-color: #00a896;
+            border-color: #2c5282;
         }
-
-        .btn-login {
+        button {
             width: 100%;
             padding: 13px;
-            background: #00a896;
+            background: #1e3a5f;
             color: white;
             border: none;
-            border-radius: 7px;
+            border-radius: 6px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: background 0.2s;
         }
-
-        .btn-login:hover {
-            background: #008c7c;
-        }
-
-        .message {
-            margin-top: 18px;
+        button:hover { background: #2c5282; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        .alert {
             padding: 12px;
             border-radius: 6px;
-            text-align: center;
+            margin-bottom: 20px;
             display: none;
-            font-size: 14px;
         }
-
-        .message.erreur {
-            background: #ffebee;
-            color: #c62828;
-            display: block;
-        }
-
-        .message.succes {
-            background: #e8f5e9;
-            color: #2e7d32;
-            display: block;
-        }
-
-        .infos-bas {
-            margin-top: 25px;
-            text-align: center;
-            font-size: 13px;
-            color: #999;
+        .alert.error { background: #fee2e2; color: #dc2626; display: block; }
+        .logo { text-align: center; margin-bottom: 20px; }
+        .logo span {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e3a5f;
         }
     </style>
 </head>
 <body>
     <div class="login-card">
-        <div class="logo-section">
-            <h1>🔐 SGPE</h1>
-            <p>Système de Gestion du Patrimoine de l'État</p>
-        </div>
-
-        <form id="form-login">
+        <div class="logo"><span>🏛️ SGPE</span></div>
+        <h1>Bienvenue</h1>
+        <p>Connectez-vous pour accéder au système</p>
+        
+        <div id="alert" class="alert"></div>
+        
+        <form id="loginForm">
             <div class="form-group">
                 <label for="email">Adresse email</label>
-                <input type="email" id="email" name="email" placeholder="votre@email.tg" required>
+                <input type="email" id="email" name="email" required>
             </div>
-
             <div class="form-group">
-                <label for="mot_de_passe">Mot de passe</label>
-                <input type="password" id="mot_de_passe" name="mot_de_passe" placeholder="••••••••" required>
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="mot_de_passe" required>
             </div>
-
-            <button type="submit" class="btn-login">Se connecter</button>
-
-            <div id="message" class="message"></div>
+            <button type="submit" id="submitBtn">Se connecter</button>
         </form>
-
-        <div class="infos-bas">
-            © 2026 SGPE — Tous droits réservés
-        </div>
     </div>
 
-    <script>
-        const API_URL = "http://localhost:8000/service-admin/api";
+    <script type="module">
+        import ApiClient from './js/api.js';
+        const api = new ApiClient('admin');
 
-        // Redirige si déjà connecté
-        if (localStorage.getItem('token')) {
-            window.location.href = 'dashboard.html';
+        const form = document.getElementById('loginForm');
+        const alertBox = document.getElementById('alert');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function showAlert(message, type = 'error') {
+            alertBox.textContent = message;
+            alertBox.className = `alert ${type}`;
+            setTimeout(() => { alertBox.style.display = 'none'; }, 5000);
         }
 
-        const form = document.getElementById('form-login');
-        const messageDiv = document.getElementById('message');
-
-        form.addEventListener('submit', async function(e) {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            // Réinitialise le message
-            messageDiv.style.display = 'none';
-            messageDiv.className = 'message';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Connexion...';
+            alertBox.style.display = 'none';
 
-            const donnees = {
+            const formData = {
                 email: document.getElementById('email').value,
-                mot_de_passe: document.getElementById('mot_de_passe').value
+                mot_de_passe: document.getElementById('password').value
             };
 
-            try {
-                const reponse = await fetch(`${API_URL}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(donnees)
-                });
+            const result = await api.post('/login', formData);
 
-                const resultat = await reponse.json();
-
-                if (reponse.ok) {
-                    // Connexion réussie — sauvegarde les infos
-                    localStorage.setItem('token', resultat.token);
-                    localStorage.setItem('utilisateur', JSON.stringify(resultat.utilisateur));
-                    
-                    messageDiv.textContent = "Connexion réussie ! Redirection...";
-                    messageDiv.classList.add('succes');
-                    
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1200);
-                } else {
-                    messageDiv.textContent = resultat.message || "Erreur de connexion";
-                    messageDiv.classList.add('erreur');
-                }
-            } catch (erreur) {
-                // Mode démo quand l'API n'est pas encore disponible
-                messageDiv.textContent = "Mode démo — cliquez pour entrer";
-                messageDiv.classList.add('succes');
-                
-                // Création d'une session démo locale
-                localStorage.setItem('utilisateur', JSON.stringify({
-                    id: 1,
-                    nom: 'Administrateur',
-                    prenom: 'SGPE',
-                    email: 'admin@sgpe.tg',
-                    role: 'admin'
-                }));
-                localStorage.setItem('token', 'demo-token-sgpe');
-                
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1500);
+            if (result.success) {
+                localStorage.setItem('auth_token', result.data.token);
+                localStorage.setItem('auth_user', JSON.stringify(result.data.utilisateur));
+                window.location.href = 'dashboard.html';
+            } else {
+                showAlert(result.message || 'Échec de la connexion');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Se connecter';
             }
         });
     </script>
