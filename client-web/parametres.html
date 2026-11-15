@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,52 +6,190 @@
     <title>Paramètres — SGPE</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f0f4f8; min-height: 100vh; }
-        .header { background: #1e3a8a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 1.25rem; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 1.5rem; font-size: 0.95rem; }
-        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
-        .card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 1.5rem; }
-        .card h2 { color: #1e3a8a; margin-bottom: 1.2rem; font-size: 1.15rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.4rem; font-weight: 500; color: #374151; font-size: 0.88rem; }
-        input, select, textarea { width: 100%; padding: 0.65rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; }
-        input:focus, select:focus { outline: none; border-color: #1e3a8a; }
-        .btn { padding: 0.65rem 1.25rem; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; text-decoration: none; display: inline-block; }
-        .btn-primary { background: #1e3a8a; color: white; }
-        .btn-primary:hover { background: #1e2d6b; }
-        .btn-success { background: #16a34a; color: white; }
-        .btn-success:hover { background: #15803d; }
-        .btn-warning { background: #f59e0b; color: #1f2937; }
-        .btn-warning:hover { background: #d97706; }
-        .btn-danger { background: #dc2626; color: white; }
-        .btn-danger:hover { background: #b91c1c; }
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; }
-        .toggle-label { font-weight: 500; color: #1f2937; }
-        .toggle-desc { font-size: 0.8rem; color: #6b7280; margin-top: 0.2rem; }
-        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        :root {
+            --primaire: #00a896; --foncee: #008080; --claire: #e6f7f5;
+            --texte: #334443; --gris: #f4f6f6; --gris-fonce: #888;
+            --succes: #16a34a; --avertissement: #f59e0b; --erreur: #dc2626;
+        }
+        body { display: flex; min-height: 100vh; background: var(--gris); }
+
+        /* Barre latérale */
+        .sidebar {
+            width: 260px; background: white; border-right: 1px solid #e0e0e0;
+            padding: 20px 0; position: fixed; height: 100vh;
+        }
+        .sidebar .logo {
+            padding: 20px 25px; font-size: 22px; font-weight: bold;
+            color: var(--foncee); border-bottom: 1px solid #eee; margin-bottom: 15px;
+        }
+        .sidebar nav a {
+            display: flex; align-items: center; padding: 14px 25px;
+            color: var(--texte); text-decoration: none; transition: background 0.2s;
+        }
+        .sidebar nav a.actif {
+            background: var(--claire); color: var(--primaire);
+            border-left: 4px solid var(--primaire);
+        }
+        .sidebar nav a:hover:not(.actif) { background: #f0f0f0; }
+        .sidebar nav a span { margin-left: 10px; }
+
+        /* Contenu principal */
+        .contenu { flex: 1; margin-left: 260px; padding: 25px; }
+        .entete {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px; flex-wrap: wrap; gap: 15px;
+        }
+        .entete h1 { font-size: 26px; color: var(--texte); }
+        .utilisateur { display: flex; align-items: center; gap: 10px; }
+        .deconnexion {
+            padding: 8px 16px; background: var(--erreur); color: white;
+            border: none; border-radius: 6px; cursor: pointer;
+        }
+
+        .info-box {
+            background: var(--claire); border-left: 4px solid var(--primaire);
+            padding: 14px 18px; border-radius: 6px; margin-bottom: 24px;
+            font-size: 14px; color: var(--texte);
+        }
+
+        .card {
+            background: white; border-radius: 10px; padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 24px;
+        }
+        .card h2 {
+            color: var(--foncee); margin-bottom: 20px; font-size: 18px;
+            padding-bottom: 10px; border-bottom: 1px solid #eee;
+        }
+
+        .grid-2 {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block; margin-bottom: 8px; font-weight: 500;
+            color: var(--texte); font-size: 14px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px 14px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 14px;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: var(--primaire);
+            box-shadow: 0 0 0 2px rgba(0, 168, 150, 0.1);
+        }
+
+        .toggle-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 0; border-bottom: 1px solid #f5f5f5;
+        }
+        .toggle-label { font-weight: 500; color: var(--texte); font-size: 14px; }
+        .toggle-desc { font-size: 12px; color: var(--gris-fonce); margin-top: 4px; }
+
+        /* Interrupteur */
+        .switch { position: relative; display: inline-block; width: 48px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 24px; transition: 0.3s; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: 0.3s; }
-        input:checked + .slider { background-color: #1e3a8a; }
-        input:checked + .slider:before { transform: translateX(20px); }
-        .btn-group { margin-top: 1rem; text-align: right; }
-        .info-box { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 0.75rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.85rem; color: #1e40af; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; border-radius: 26px; transition: 0.3s;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 20px; width: 20px;
+            left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: 0.3s;
+        }
+        input:checked + .slider { background-color: var(--primaire); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        .btn-group { margin-top: 20px; text-align: right; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+        .btn {
+            padding: 10px 18px; border: none; border-radius: 6px;
+            font-size: 14px; font-weight: 500; cursor: pointer;
+            text-decoration: none; display: inline-block;
+        }
+        .btn-primaire { background: var(--primaire); color: white; }
+        .btn-primaire:hover { background: var(--foncee); }
+        .btn-secondaire { background: #e5e7eb; color: var(--texte); }
+        .btn-succes { background: var(--succes); color: white; }
+        .btn-avertissement { background: var(--avertissement); color: #1f2937; }
+        .btn-danger { background: var(--erreur); color: white; }
+
+        .info-systeme {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 14px;
+        }
+        .info-systeme div { padding: 6px 0; }
+        .info-systeme strong { color: var(--foncee); }
+
+        .message-succes {
+            display: none; margin-top: 16px; padding: 12px 16px;
+            background: #e8f5e9; color: #2e7d32; border-radius: 6px;
+        }
+        .message-succes.visible { display: block; }
+
+        /* Responsive */
+        @media(max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo { font-size: 0; padding: 20px 5px; }
+            .sidebar nav a span { display: none; }
+            .contenu { margin-left: 70px; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .info-systeme { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🏛️ SGPE — Gestion du Patrimoine</h1>
-        <div class="nav-links">
-            <a href="dashboard.html">Tableau de bord</a>
-            <a href="utilisateurs.html">Utilisateurs</a>
-            <a href="parametres.html">Paramètres</a>
-            <a href="login.html">Déconnexion</a>
-        </div>
-    </div>
+    <!-- Vérification de connexion -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const connecte = localStorage.getItem('connecte');
+            if (!connecte || connecte !== 'oui') {
+                alert('Veuillez vous connecter d\'abord');
+                window.location.href = 'login.html';
+                return;
+            }
 
-    <div class="container">
+            // Afficher le nom de l'utilisateur
+            const utilisateur = JSON.parse(localStorage.getItem('utilisateur') || '{}');
+            if (utilisateur.prenom && utilisateur.nom) {
+                document.getElementById('nom-utilisateur').textContent = utilisateur.prenom + ' ' + utilisateur.nom;
+            }
+        });
+
+        function deconnecter() {
+            localStorage.removeItem('connecte');
+            localStorage.removeItem('utilisateur');
+            window.location.href = 'login.html';
+        }
+
+        function sauvegarderParametres() {
+            const message = document.getElementById('message-succes');
+            message.classList.add('visible');
+            setTimeout(() => message.classList.remove('visible'), 3000);
+        }
+    </script>
+
+    <!-- Barre latérale -->
+    <aside class="sidebar">
+        <div class="logo">SGPE</div>
+        <nav>
+            <a href="dashboard.html">🏠 <span>Tableau de bord</span></a>
+            <a href="inventaire.html">📋 <span>Inventaire</span></a>
+            <a href="ajouter-bien.html">➕ <span>Ajouter un bien</span></a>
+            <a href="affectations.html">🔄 <span>Affectations</span></a>
+            <a href="utilisateurs.html">👥 <span>Utilisateurs</span></a>
+            <a href="parametres.html" class="actif">⚙️ <span>Paramètres</span></a>
+        </nav>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="contenu">
+        <div class="entete">
+            <h1>⚙️ Paramètres du système</h1>
+            <div class="utilisateur">
+                <span id="nom-utilisateur">Utilisateur</span>
+                <button class="deconnexion" onclick="deconnecter()">Déconnexion</button>
+            </div>
+        </div>
+
         <div class="info-box">
             ⚙️ Ces paramètres influencent le fonctionnement global de l'application. Seuls les administrateurs peuvent les modifier.
         </div>
@@ -63,25 +200,25 @@
             <div class="grid-2">
                 <div class="form-group">
                     <label>Nom de l'organisation</label>
-                    <input type="text" value="Ministère de l'Économie et des Finances">
+                    <input type="text" id="org-nom" value="Ministère de l'Économie et des Finances">
                 </div>
                 <div class="form-group">
                     <label>Sigle</label>
-                    <input type="text" value="MEF">
+                    <input type="text" id="org-sigle" value="MEF">
                 </div>
             </div>
             <div class="form-group">
                 <label>Adresse complète</label>
-                <input type="text" value="Boulevard du 13 Janvier, Lomé — Togo">
+                <input type="text" id="org-adresse" value="Boulevard du 13 Janvier, Lomé — Togo">
             </div>
             <div class="grid-2">
                 <div class="form-group">
                     <label>Email de contact</label>
-                    <input type="email" value="contact@mef.gouv.tg">
+                    <input type="email" id="org-email" value="contact@mef.gouv.tg">
                 </div>
                 <div class="form-group">
                     <label>Téléphone</label>
-                    <input type="text" value="+228 22 22 22 22">
+                    <input type="text" id="org-tel" value="+228 22 22 22 22">
                 </div>
             </div>
         </div>
@@ -96,7 +233,7 @@
                     <div class="toggle-desc">Envoyer un email pour les alertes et rappels importants</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" checked>
+                    <input type="checkbox" id="notifications" checked>
                     <span class="slider"></span>
                 </label>
             </div>
@@ -107,7 +244,7 @@
                     <div class="toggle-desc">Déconnexion après 30 minutes d'inactivité</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" checked>
+                    <input type="checkbox" id="verrouillage" checked>
                     <span class="slider"></span>
                 </label>
             </div>
@@ -118,7 +255,7 @@
                     <div class="toggle-desc">Bloque l'accès aux utilisateurs pendant les mises à jour</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox">
+                    <input type="checkbox" id="maintenance">
                     <span class="slider"></span>
                 </label>
             </div>
@@ -129,14 +266,14 @@
                     <div class="toggle-desc">Enregistrer toutes les actions des utilisateurs dans les logs</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" checked>
+                    <input type="checkbox" id="journalisation" checked>
                     <span class="slider"></span>
                 </label>
             </div>
 
-            <div class="form-group" style="margin-top: 1rem;">
-                <label>Durée de conservation des historiques (mois)</label>
-                <select>
+            <div class="form-group" style="margin-top: 16px;">
+                <label>Durée de conservation des historiques</label>
+                <select id="duree-historique">
                     <option>6 mois</option>
                     <option>12 mois</option>
                     <option selected>24 mois</option>
@@ -152,35 +289,39 @@
             
             <div class="form-group">
                 <label>Fréquence des sauvegardes automatiques</label>
-                <select>
+                <select id="sauvegarde-freq">
                     <option>Quotidienne</option>
                     <option selected>Hebdomadaire</option>
                     <option>Mensuelle</option>
                 </select>
             </div>
 
-            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
-                <button class="btn btn-success">📤 Exporter toutes les données</button>
-                <button class="btn btn-warning">💾 Lancer une sauvegarde maintenant</button>
-                <button class="btn btn-danger">🗑️ Nettoyer les anciennes données</button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
+                <button class="btn btn-succes" onclick="alert('📤 Export en cours...')">📤 Exporter toutes les données</button>
+                <button class="btn btn-avertissement" onclick="alert('💾 Sauvegarde lancée !')">💾 Lancer une sauvegarde</button>
+                <button class="btn btn-danger" onclick="if(confirm('⚠️ Supprimer les anciennes données ?')) alert('🗑️ Nettoyage effectué')">🗑️ Nettoyer les données</button>
             </div>
         </div>
 
         <!-- Section 4 : Informations techniques -->
         <div class="card">
             <h2>ℹ️ Informations système</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
+            <div class="info-systeme">
                 <div><strong>Version de l'application :</strong> 1.0.0</div>
-                <div><strong>Dernière mise à jour :</strong> 14/11/2026</div>
+                <div><strong>Dernière mise à jour :</strong> 15/11/2026</div>
                 <div><strong>Base de données :</strong> PostgreSQL 17</div>
                 <div><strong>Environnement :</strong> Développement</div>
             </div>
         </div>
 
         <div class="btn-group">
-            <a href="dashboard.html" class="btn btn-secondary" style="background: #e5e7eb; color: #374151;">Annuler — Retour</a>
-            <button class="btn btn-primary">💾 Enregistrer les paramètres</button>
+            <a href="dashboard.html" class="btn btn-secondaire">← Retour au tableau de bord</a>
+            <button class="btn btn-primaire" onclick="sauvegarderParametres()">💾 Enregistrer les paramètres</button>
         </div>
-    </div>
+
+        <div id="message-succes" class="message-succes">
+            ✅ Paramètres enregistrés avec succès !
+        </div>
+    </main>
 </body>
 </html>

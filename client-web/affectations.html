@@ -6,47 +6,187 @@
     <title>SGPE — Gestion des Affectations</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        :root { --primaire: #00a896; --foncee: #008080; --claire: #e6f7f5; --texte: #334443; --gris: #f4f6f6; --gris-fonce: #888; }
+        :root { 
+            --primaire: #00a896; 
+            --foncee: #008080; 
+            --claire: #e6f7f5; 
+            --texte: #334443; 
+            --gris: #f4f6f6; 
+            --gris-fonce: #888; 
+        }
         body { display: flex; min-height: 100vh; background: var(--gris); }
-        .sidebar { width: 260px; background: white; border-right: 1px solid #e0e0e0; padding: 20px 0; position: fixed; height: 100vh; }
-        .sidebar .logo { padding: 20px 25px; font-size: 22px; font-weight: bold; color: var(--foncee); border-bottom: 1px solid #eee; margin-bottom: 15px; }
-        .sidebar nav a { display: flex; align-items: center; padding: 14px 25px; color: var(--texte); text-decoration: none; }
-        .sidebar nav a.actif { background: var(--claire); color: var(--primaire); border-left: 4px solid var(--primaire); }
+        
+        /* Barre latérale */
+        .sidebar { 
+            width: 260px; 
+            background: white; 
+            border-right: 1px solid #e0e0e0; 
+            padding: 20px 0; 
+            position: fixed; 
+            height: 100vh; 
+        }
+        .sidebar .logo { 
+            padding: 20px 25px; 
+            font-size: 22px; 
+            font-weight: bold; 
+            color: var(--foncee); 
+            border-bottom: 1px solid #eee; 
+            margin-bottom: 15px; 
+        }
+        .sidebar nav a { 
+            display: flex; 
+            align-items: center; 
+            padding: 14px 25px; 
+            color: var(--texte); 
+            text-decoration: none; 
+        }
+        .sidebar nav a.actif { 
+            background: var(--claire); 
+            color: var(--primaire); 
+            border-left: 4px solid var(--primaire); 
+        }
         .sidebar nav a:hover:not(.actif) { background: #f0f0f0; }
         .sidebar nav a span { margin-left: 10px; }
+
+        /* Contenu principal */
         .contenu { flex: 1; margin-left: 260px; padding: 25px; }
-        .entete { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .entete { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+        }
         .entete h1 { font-size: 26px; color: var(--texte); }
-        .btn { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; text-decoration: none; display: inline-block; }
+        .btn { 
+            padding: 10px 18px; 
+            border-radius: 6px; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 500; 
+            text-decoration: none; 
+            display: inline-block; 
+        }
         .btn-primaire { background: var(--primaire); color: white; }
         .btn-primaire:hover { background: #009484; }
         .btn-secondaire { background: #e0e0e0; color: var(--texte); }
         .btn-sm { padding: 6px 12px; font-size: 13px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
-        .modal.ouvert { display: flex; }
-        .modal-content { background: white; padding: 30px; border-radius: 10px; max-width: 550px; width: 90%; max-height: 90vh; overflow-y: auto; }
-        .modal-content h2 { font-size: 20px; margin-bottom: 20px; color: var(--texte); }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group.full-width { grid-column: 1 / -1; }
-        .form-group label { display: block; margin-bottom: 6px; color: var(--texte); font-weight: 500; font-size: 14px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primaire); }
-        .actions-modal { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
-        .filtres { background: white; padding: 18px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
-        .filtres input, .filtres select { padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 160px; }
-        .boite-tableau { background: white; padding: 20px; border-radius: 8px; overflow-x: auto; }
+        .utilisateur { display: flex; align-items: center; gap: 10px; }
+        .deconnexion { 
+            padding: 8px 16px; 
+            background: #e53935; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+        }
+
+        /* Filtres */
+        .filtres { 
+            background: white; 
+            padding: 18px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            display: flex; 
+            gap: 12px; 
+            flex-wrap: wrap; 
+        }
+        .filtres input, .filtres select { 
+            padding: 9px 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            font-size: 14px; 
+            min-width: 160px; 
+        }
+
+        /* Tableau */
+        .boite-tableau { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            overflow-x: auto; 
+        }
         table { width: 100%; border-collapse: collapse; }
-        table th, table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        table th, table td { 
+            padding: 12px 10px; 
+            text-align: left; 
+            border-bottom: 1px solid #eee; 
+            font-size: 14px; 
+        }
         table th { background: #fafafa; color: #666; font-weight: 600; }
-        .statut { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .statut { 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-size: 12px; 
+            font-weight: 500; 
+        }
         .statut.en-cours { background: #e8f5e9; color: #2e7d32; }
         .statut.retourne { background: #e3f2fd; color: #1565c0; }
         .statut.perdu { background: #ffebee; color: #c62828; }
         .vide { text-align: center; padding: 40px; color: var(--gris-fonce); }
-        .utilisateur { display: flex; align-items: center; gap: 10px; }
-        .deconnexion { padding: 8px 16px; background: #e53935; color: white; border: none; border-radius: 6px; cursor: pointer; }
-        .fermer { float: right; background: none; border: none; font-size: 22px; cursor: pointer; color: #999; }
+
+        /* Modal */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000; 
+        }
+        .modal.ouvert { display: flex; }
+        .modal-content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            max-width: 550px; 
+            width: 90%; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
+        .modal-content h2 { font-size: 20px; margin-bottom: 20px; color: var(--texte); }
+        .fermer { 
+            float: right; 
+            background: none; 
+            border: none; 
+            font-size: 22px; 
+            cursor: pointer; 
+            color: #999; 
+        }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 6px; 
+            color: var(--texte); 
+            font-weight: 500; 
+            font-size: 14px; 
+        }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; 
+            padding: 10px 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            font-size: 14px; 
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { 
+            outline: none; 
+            border-color: var(--primaire); 
+        }
+        .actions-modal { 
+            margin-top: 20px; 
+            display: flex; 
+            gap: 10px; 
+            justify-content: flex-end; 
+        }
+
+        /* Responsive */
         @media(max-width: 900px) {
             .sidebar { width: 70px; }
             .sidebar .logo { font-size: 0; padding: 20px 5px; }
@@ -57,6 +197,28 @@
     </style>
 </head>
 <body>
+    <!-- Vérification de connexion -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const connecte = localStorage.getItem('connecte');
+            if (!connecte || connecte !== 'oui') {
+                alert('Veuillez vous connecter d\'abord');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Afficher le nom de l'utilisateur
+            const utilisateur = JSON.parse(localStorage.getItem('utilisateur') || '{}');
+            if (utilisateur.prenom && utilisateur.nom) {
+                document.getElementById('nom-utilisateur').textContent = utilisateur.prenom + ' ' + utilisateur.nom;
+            }
+
+            // Charger les données
+            chargerAffectations();
+        });
+    </script>
+
+    <!-- Barre latérale -->
     <aside class="sidebar">
         <div class="logo">SGPE</div>
         <nav>
@@ -69,11 +231,12 @@
         </nav>
     </aside>
 
+    <!-- Contenu principal -->
     <main class="contenu">
         <div class="entete">
             <h1>Gestion des Affectations</h1>
             <div class="utilisateur">
-                <span id="nom-utilisateur">Admin</span>
+                <span id="nom-utilisateur">Utilisateur</span>
                 <button class="deconnexion" onclick="deconnecter()">Déconnexion</button>
             </div>
         </div>
@@ -168,20 +331,32 @@
         </div>
     </div>
 
+    <script src="js/demo-data.js"></script>
     <script>
-        const API_URL = "http://localhost:8000//api";
         let toutesAffectations = [];
 
-        function verifierConnexion() {
-            if (!localStorage.getItem('token')) {
-                window.location.href = 'login.html';
-            }
-            const u = JSON.parse(localStorage.getItem('utilisateur') || '{}');
-            document.getElementById('nom-utilisateur').textContent = u.prenom + ' ' + u.nom;
+        // Données de démonstration
+        const DEMO_AFFECTATIONS = [
+            { ref: 'EQ-024', bien: 'Ordinateur portable HP', resp: 'M. Amara KOUASSI', service: 'Service Informatique', dateAff: '2026-11-01', statut: 'en-cours' },
+            { ref: 'MB-018', bien: 'Table de réunion', resp: 'Mme Afi MENSAH', service: 'Salle de réunion', dateAff: '2026-10-15', statut: 'retourne' },
+            { ref: 'VE-007', bien: 'Véhicule de service TOYOTA', resp: 'M. Jean KOMLAN', service: 'Service Logistique', dateAff: '2026-11-10', statut: 'en-cours' },
+            { ref: 'IM-003', bien: 'Imprimante salle B', resp: 'Mme Lili AFI', service: 'Service Comptabilité', dateAff: '2026-09-05', statut: 'perdu' },
+        ];
+
+        function chargerAffectations() {
+            // Charger depuis localStorage ou utiliser les données de démo
+            const stockees = localStorage.getItem('affectations');
+            toutesAffectations = stockees ? JSON.parse(stockees) : DEMO_AFFECTATIONS;
+            afficherAffectations(toutesAffectations);
+        }
+
+        function sauvegarderAffectations() {
+            localStorage.setItem('affectations', JSON.stringify(toutesAffectations));
         }
 
         function deconnecter() {
-            localStorage.clear();
+            localStorage.removeItem('connecte');
+            localStorage.removeItem('utilisateur');
             window.location.href = 'login.html';
         }
 
@@ -193,14 +368,6 @@
             document.getElementById('modal-affectation').classList.remove('ouvert');
             document.getElementById('form-affectation').reset();
         }
-        
-
-        async function chargerBiens() {
-             const reponse = await fetch(`${API_URL}/biens`);
-             const biens = await reponse.json();
-            console.log(biens);
-        }
-
 
         function afficherAffectations(liste) {
             const tbody = document.getElementById('corps-tableau');
@@ -217,34 +384,5 @@
                     <td>${a.dateAff}</td>
                     <td><span class="statut ${a.statut}">${a.statut === 'en-cours' ? 'En cours' : a.statut === 'retourne' ? 'Retourné' : 'Perdu'}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-secondaire">✏️</button>
-                        <button class="btn btn-sm btn-secondaire">🗑️</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function filtrer() {
-            const recherche = document.getElementById('recherche').value.toLowerCase();
-            const statut = document.getElementById('filtre-statut').value;
-            const filtre = toutesAffectations.filter(a => {
-                return (!recherche || a.bien.toLowerCase().includes(recherche) || a.resp.toLowerCase().includes(recherche))
-                    && (!statut || a.statut === statut);
-            });
-            afficherAffectations(filtre);
-        }
-
-        document.getElementById('form-affectation').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('✅ Affectation enregistrée ! (Mode démo)');
-            fermerModal();
-        });
-
-        document.getElementById('recherche').addEventListener('input', filtrer);
-        document.getElementById('filtre-statut').addEventListener('change', filtrer);
-
-        verifierConnexion();
-        chargerAffectations();
-    </script>
-</body>
-</html>
+                        <button class="btn btn-sm btn-secondaire" title="Modifier">✏️</button>
+                        <button

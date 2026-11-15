@@ -1,12 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="0; url=login.html">
-    <title>SGPE — Redirection</title>
+    <title>SGPE — Système de Gestion du Patrimoine de l'État</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #00a896 0%, #008080 100%);
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            text-align: center;
+        }
+        .contenu {
+            padding: 40px;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        .lien {
+            color: white;
+            text-decoration: underline;
+            font-size: 15px;
+        }
+    </style>
 </head>
 <body>
-    Redirection...
-    <script>window.location.href = "login.html";</script>
+    <div class="contenu">
+        <h1>SGPE</h1>
+        <p>Système de Gestion du Patrimoine de l'État</p>
+        <p>Redirection vers la page de connexion...</p>
+        <a href="login.html" class="lien">Cliquez ici si vous n'êtes pas redirigé</a>
+    </div>
+    <script>
+        window.location.href = "login.html";
+    </script>
 </body>
 </html>

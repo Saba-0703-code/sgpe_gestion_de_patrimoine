@@ -11,6 +11,8 @@
             --texte: #334443; --gris: #f4f6f6; --gris-fonce: #888;
         }
         body { display: flex; min-height: 100vh; background: var(--gris); }
+        
+        /* Barre latérale */
         .sidebar {
             width: 260px; background: white; border-right: 1px solid #e0e0e0;
             padding: 20px 0; position: fixed; height: 100vh;
@@ -30,12 +32,18 @@
         .sidebar nav a:hover:not(.actif) { background: #f0f0f0; }
         .sidebar nav a span { margin-left: 10px; }
 
+        /* Contenu principal */
         .contenu { flex: 1; margin-left: 260px; padding: 25px; }
         .entete {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 25px; flex-wrap: wrap; gap: 15px;
         }
         .entete h1 { font-size: 26px; color: var(--texte); }
+        .utilisateur { display: flex; align-items: center; gap: 10px; }
+        .deconnexion {
+            padding: 8px 16px; background: #e53935; color: white;
+            border: none; border-radius: 6px; cursor: pointer;
+        }
         .actions { display: flex; gap: 10px; }
         .btn {
             padding: 10px 18px; border-radius: 6px; border: none;
@@ -45,6 +53,7 @@
         .btn-primaire:hover { background: #009484; }
         .btn-secondaire { background: #e0e0e0; color: var(--texte); }
 
+        /* Filtres */
         .filtres {
             background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;
             display: flex; gap: 15px; flex-wrap: wrap;
@@ -55,6 +64,7 @@
         }
         .filtres input:focus, .filtres select:focus { outline: none; border-color: var(--primaire); }
 
+        /* Tableau */
         .boite-tableau { background: white; padding: 20px; border-radius: 8px; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         table th, table td {
@@ -68,15 +78,180 @@
         .etat.moyen { background: #fff8e1; color: #f57c00; }
         .etat.mauvais { background: #ffebee; color: #c62828; }
         .actions-ligne a { margin-right: 8px; color: var(--primaire); text-decoration: none; font-size: 13px; }
-
         .vide { text-align: center; padding: 40px; color: var(--gris-fonce); }
-        .utilisateur { display: flex; align-items: center; gap: 10px; }
-        .deconnexion {
-            padding: 8px 16px; background: #e53935; color: white;
-            border: none; border-radius: 6px; cursor: pointer;
+
+        /* Responsive */
+        @media(max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo { font-size: 0; padding: 20px 5px; }
+            .sidebar nav a span { display: none; }
+            .contenu { margin-left: 70px; }
         }
     </style>
 </head>
 <body>
+    <!-- Vérification de connexion -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const connecte = localStorage.getItem('connecte');
+            if (!connecte || connecte !== 'oui') {
+                alert('Veuillez vous connecter d\'abord');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Afficher le nom de l'utilisateur
+            const utilisateur = JSON.parse(localStorage.getItem('utilisateur') || '{}');
+            if (utilisateur.prenom && utilisateur.nom) {
+                document.getElementById('nom-utilisateur').textContent = utilisateur.prenom + ' ' + utilisateur.nom;
+            }
+
+            // Charger les biens
+            chargerBiens();
+        });
+    </script>
+
+    <!-- Barre latérale -->
     <aside class="sidebar">
-        <div class="logo">SGPE
+        <div class="logo">SGPE</div>
+        <nav>
+            <a href="dashboard.html">🏠 <span>Tableau de bord</span></a>
+            <a href="inventaire.html" class="actif">📋 <span>Inventaire</span></a>
+            <a href="ajouter-bien.html">➕ <span>Ajouter un bien</span></a>
+            <a href="affectations.html">🔄 <span>Affectations</span></a>
+            <a href="utilisateurs.html">👥 <span>Utilisateurs</span></a>
+            <a href="rapports.html">📊 <span>Rapports</span></a>
+        </nav>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="contenu">
+        <div class="entete">
+            <h1>Inventaire des Biens</h1>
+            <div class="utilisateur">
+                <span id="nom-utilisateur">Utilisateur</span>
+                <button class="deconnexion" onclick="deconnecter()">Déconnexion</button>
+            </div>
+        </div>
+
+        <div class="entete">
+            <a href="ajouter-bien.html" class="btn btn-primaire">➕ Ajouter un Bien</a>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filtres">
+            <input type="text" id="recherche" placeholder="Rechercher un bien...">
+            <select id="filtre-categorie">
+                <option value="">Toutes les catégories</option>
+                <option>Matériel informatique</option>
+                <option>Mobilier</option>
+                <option>Véhicule</option>
+                <option>Équipement</option>
+                <option>Autre</option>
+            </select>
+            <select id="filtre-etat">
+                <option value="">Tous les états</option>
+                <option>Neuf</option>
+                <option>Bon</option>
+                <option>Moyen</option>
+                <option>Mauvais</option>
+            </select>
+        </div>
+
+        <!-- Tableau -->
+        <div class="boite-tableau">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Référence</th>
+                        <th>Nom du bien</th>
+                        <th>Catégorie</th>
+                        <th>État</th>
+                        <th>Valeur</th>
+                        <th>Localisation</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="corps-inventaire">
+                    <tr><td colspan="7" class="vide">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // Données de démonstration par défaut
+        const DEMO_BIENS = [
+            { reference: 'EQ-024', designation: 'Ordinateur portable', categorie: 'Matériel informatique', etat: 'Bon', valeur: '850 000 FCFA', localisation: 'Bureau A10' },
+            { reference: 'MB-018', designation: 'Table de réunion', categorie: 'Mobilier', etat: 'Bon', valeur: '150 000 FCFA', localisation: 'Salle de réunion' },
+            { reference: 'VE-007', designation: 'Véhicule de service', categorie: 'Véhicule', etat: 'Bon', valeur: '8 500 000 FCFA', localisation: 'Parc automobile' },
+            { reference: 'IM-003', designation: 'Imprimante', categorie: 'Équipement', etat: 'Moyen', valeur: '250 000 FCFA', localisation: 'Service Comptabilité' },
+        ];
+
+        // Déconnexion
+        function deconnecter() {
+            localStorage.removeItem('connecte');
+            localStorage.removeItem('utilisateur');
+            window.location.href = 'login.html';
+        }
+
+        // Récupérer la liste des biens
+        function getBiens() {
+            const stockees = localStorage.getItem('biens');
+            return stockees ? JSON.parse(stockees) : DEMO_BIENS;
+        }
+
+        // Afficher les biens dans le tableau
+        function afficherBiens(liste) {
+            const tbody = document.getElementById('corps-inventaire');
+            if (liste.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="vide">Aucun bien ne correspond à votre recherche</td></tr>';
+                return;
+            }
+            tbody.innerHTML = liste.map(b => `
+                <tr>
+                    <td><strong>${b.reference || ''}</strong></td>
+                    <td>${b.designation || b.nom || ''}</td>
+                    <td>${b.categorie || ''}</td>
+                    <td><span class="etat ${b.etat === 'Bon' ? 'bon' : b.etat === 'Moyen' ? 'moyen' : 'mauvais'}">${b.etat || ''}</span></td>
+                    <td>${b.valeur || ''}</td>
+                    <td>${b.localisation || ''}</td>
+                    <td class="actions-ligne">
+                        <a href="fiche-bien.html">📄 Fiche</a>
+                        <a href="ajouter-bien.html">✏️ Modifier</a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Filtrer les biens
+        function filtrerBiens() {
+            const recherche = document.getElementById('recherche').value.toLowerCase();
+            const categorie = document.getElementById('filtre-categorie').value;
+            const etat = document.getElementById('filtre-etat').value;
+            const tousBiens = getBiens();
+
+            const resultat = tousBiens.filter(b => {
+                const correspondRecherche = !recherche || 
+                    (b.reference && b.reference.toLowerCase().includes(recherche)) ||
+                    (b.designation && b.designation.toLowerCase().includes(recherche));
+                const correspondCategorie = !categorie || b.categorie === categorie;
+                const correspondEtat = !etat || b.etat === etat;
+                return correspondRecherche && correspondCategorie && correspondEtat;
+            });
+
+            afficherBiens(resultat);
+        }
+
+        // Charger les biens au démarrage
+        function chargerBiens() {
+            afficherBiens(getBiens());
+        }
+
+        // Événements des filtres
+        document.getElementById('recherche').addEventListener('input', filtrerBiens);
+        document.getElementById('filtre-categorie').addEventListener('change', filtrerBiens);
+        document.getElementById('filtre-etat').addEventListener('change', filtrerBiens);
+    </script>
+</body>
+</html>

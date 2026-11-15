@@ -147,117 +147,132 @@
         </nav>
     </aside>
 
-                    </thead>
-                    <tbody>
+    <!-- Contenu principal -->
+    <main class="contenu">
+        <div class="entete">
+            <div>
+                <h1>Tableau de Bord</h1>
+                <p>Bienvenue dans la gestion du patrimoine de l'État</p>
+            </div>
+            <div class="utilisateur">
+                <span id="nom-utilisateur">Utilisateur</span>
+                <button class="deconnexion" onclick="deconnecter()">Déconnexion</button>
+            </div>
+        </div>
+
+        <!-- Cartes statistiques -->
+        <div class="grille-cartes">
+            <div class="carte">
+                <div class="valeur" id="stat-total">--</div>
+                <div class="etiquette">Total des biens</div>
+            </div>
+            <div class="carte">
+                <div class="valeur" id="stat-valeur">--</div>
+                <div class="etiquette">Valeur totale</div>
+            </div>
+            <div class="carte">
+                <div class="valeur" id="stat-bon">--</div>
+                <div class="etiquette">En bon état</div>
+            </div>
+            <div class="carte">
+                <div class="valeur" id="stat-reviser">--</div>
+                <div class="etiquette">À réviser</div>
+            </div>
+        </div>
+
+        <!-- Tableau et graphique -->
+        <div class="grille-contenu">
+            <div class="boite">
+                <h3>📦 Derniers biens enregistrés</h3>
+                <table id="table-derniers">
+                    <thead>
                         <tr>
+                            <th>Référence</th>
+                            <th>Désignation</th>
+                            <th>Catégorie</th>
+                            <th>État</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr>
+                            <td colspan="4" style="text-align:center;color:#999;padding:20px;">Chargement...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <div class="boite">
                 <h3>📈 Répartition par catégorie</h3>
-                <div id="graphique-placeholder" style="padding:30px;text-align:center;color:#999;">
-                    Graphique — à connecter à l'API
+                <div style="padding:30px;text-align:center;color:#999;">
+                    Graphique — Données de démo
                 </div>
             </div>
         </div>
     </main>
 
+    <script src="js/demo-data.js"></script>
     <script>
-        const API_URL = "http://localhost:8000";
-
-                            <td colspan="4" style="text-align:center;color:#999;padding:20px;">Chargement...</td>
-        // Vérifie si connecté
-        function verifierConnexion() {
-            const token = localStorage.getItem('token');
-             <!-- Contenu principal -->
-            if (!token) {
-             <main class="contenu">
+        // Vérifier si l'utilisateur est connecté
+        document.addEventListener('DOMContentLoaded', function() {
+            const connecte = localStorage.getItem('connecte');
+            if (!connecte || connecte !== 'oui') {
+                alert('Veuillez vous connecter d\'abord');
                 window.location.href = 'login.html';
-
-            }
-            const utilisateur = JSON.parse(localStorage.getItem('utilisateur') || '{}');
-            document.getElementById('nom-utilisateur').textContent = 
-
-                utilisateur.prenom + ' ' + utilisateur.nom || 'Utilisateur';
-        }
-
-        function deconnecter() {
-            localStorage.removeItem('token');
-            localStorage.removeItem('utilisateur');
-
-            window.location.href = 'login.html';
-        }
-
-        // Charger les données
-        async function chargerDonnees() {
-            try {
-                const reponse = await fetch(`${API_URL}/service-biens/api/biens`, {
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                });
-                
-                if (reponse.ok) {
-                    const biens = await reponse.json();
-                    mettreAJourTableau(biens);
-                    mettreAJourStatistiques(biens);
-                }
-            } catch (e) {
-                console.log("API non disponible — données de démonstration");
-                chargerDonneesDemo();
-            }
-        }
-
-        function mettreAJourTableau(biens) {
-            const tbody = document.querySelector('#table-derniers tbody');
-            if (biens.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#999;padding:20px;">Aucun bien enregistré</td></tr>';
                 return;
             }
-                <tr>
-                    <td>${b.reference || '-'}</td>
-                    <td>${b.nom}</td>
-                    <td>${b.categorie}</td>
-                    <td><span class="etat ${b.etat === 'Bon' ? 'bon' : b.etat === 'Moyen' ? 'moyen' : 'mauvais'}">${b.etat}</span></td>
-                </tr>
-            `).join('');
-        }
 
-        function mettreAJourStatistiques(biens) {
-            document.getElementById('total-biens').textContent = biens.length;
-            const total = biens.reduce((sum, b) => sum + parseFloat(b.valeur || 0), 0);
-            document.getElementById('valeur-totale').textContent = new Intl.NumberFormat('fr-FR').format(total) + ' FCFA';
-            document.getElementById('en-utilisation').textContent = Math.floor(biens.length * 0.75);
-            document.getElementById('etat-mauvais').textContent = biens.filter(b => b.etat === 'Mauvais').length;
-        }
+            // Afficher le nom de l'utilisateur
+            const utilisateur = JSON.parse(localStorage.getItem('utilisateur') || '{}');
+            if (utilisateur.prenom && utilisateur.nom) {
+                document.getElementById('nom-utilisateur').textContent = utilisateur.prenom + ' ' + utilisateur.nom;
+            }
 
-        function chargerDonneesDemo() {
-            document.getElementById('total-biens').textContent = '24';
-            document.getElementById('valeur-totale').textContent = '45 850 000 FCFA';
-            document.getElementById('en-utilisation').textContent = '18';
-            document.getElementById('etat-mauvais').textContent = '3';
+            // Charger les statistiques
+            if (typeof DEMO_DATA !== 'undefined') {
+                document.getElementById('stat-total').textContent = DEMO_DATA.statistiques.total_biens;
+                document.getElementById('stat-valeur').textContent = DEMO_DATA.statistiques.valeur_totale;
+                document.getElementById('stat-bon').textContent = DEMO_DATA.statistiques.en_bonne_etat;
+                document.getElementById('stat-reviser').textContent = DEMO_DATA.statistiques.a_reviser;
+
+                // Charger les derniers biens
+                afficherDerniersBiens();
+            }
+        });
+
+        // Afficher les 5 derniers biens
+        function afficherDerniersBiens() {
+            const biens = JSON.parse(localStorage.getItem('biens')) || DEMO_DATA.biens;
+            const tbody = document.getElementById('table-body');
+            
+            // Prendre les 5 derniers éléments
             const derniers = biens.slice(-5).reverse();
-            document.querySelector('#table-derniers tbody').innerHTML = `
-            tbody.innerHTML = derniers.map(b => `
-                <tr><td>EQ-024</td><td>Ordinateur portable</td><td>Équipement</td><td><span class="etat bon">Bon</span></td></tr>
+            
+            tbody.innerHTML = '';
+            derniers.forEach((bien, index) => {
+                // Déterminer la classe de l'état
+                let etatClasse = 'bon';
+                if (bien.etat === 'Moyen') etatClasse = 'moyen';
+                if (bien.etat === 'Dégradé' || bien.etat === 'Mauvais') etatClasse = 'mauvais';
 
-                <tr><td>MB-018</td><td>Table de réunion</td><td>Mobilier</td><td><span class="etat bon">Bon</span></td></tr>
-
-                <tr><td>VE-007</td><td>Véhicule de service</td><td>Véhicule</td><td><span class="etat moyen">Moyen</span></td></tr>
-
-                <tr><td>IM-003</td><td>Imprimante salle B</td><td>Équipement</td><td><span class="etat mauvais">Mauvais</span></td></tr>
-            `;
-
+                // Générer une référence
+                const ref = 'EQ-' + String(100 + index).padStart(3, '0');
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${ref}</strong></td>
+                        <td>${bien.designation}</td>
+                        <td>${bien.categorie}</td>
+                        <td><span class="etat ${etatClasse}">${bien.etat}</span></td>
+                    </tr>
+                `;
+            });
         }
 
-
-        // Initialisation
-
-        verifierConnexion();
-
-        chargerDonnees();
+        // Fonction de déconnexion
+        function deconnecter() {
+            localStorage.removeItem('connecte');
+            localStorage.removeItem('utilisateur');
+            window.location.href = 'login.html';
+        }
     </script>
-
 </body>
-
 </html>
-

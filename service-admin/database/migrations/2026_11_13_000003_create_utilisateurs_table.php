@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('prenom');
             $table->string('email')->unique();
             $table->string('mot_de_passe');
+            $table->string('telephone')->nullable();
             $table->string('role');
             $table->boolean('est_actif')->default(true);
             $table->rememberToken();

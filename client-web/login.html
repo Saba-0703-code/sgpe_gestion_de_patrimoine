@@ -22,7 +22,7 @@
             overflow: hidden;
         }
 
-                /* 🌍 Illustration gauche */
+        /* 🌍 Partie gauche : Illustration */
         .illustration {
             position: absolute;
             left: 0;
@@ -32,27 +32,34 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(to right, #F8FAFC 0%, #FFFFFF 100%);
+            background: linear-gradient(135deg, #F0FDF9 0%, #FFFFFF 100%);
         }
 
-        .illustration img {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
+        .illustration-content {
+            text-align: center;
+            padding: 40px;
         }
 
         .globe {
             font-size: 120px;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .illustration-content h2 {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 600;
             color: #0F766E;
+            margin-bottom: 12px;
         }
 
-        /* 📦 Carte de connexion droite */
+        .illustration-content p {
+            font-size: 16px;
+            color: #64748B;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        /* 🔐 Partie droite : Formulaire de connexion */
         .login-container {
             position: absolute;
             right: 8%;
@@ -119,43 +126,70 @@
             border: 1px solid #CBD5E1;
             border-radius: 8px;
             font-size: 15px;
-            transition: border 0.2s;
+            transition: border 0.2s, box-shadow 0.2s;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #00C4A7;
-            box-shadow: 0 0 0 3px rgba(0, 196, 167, 0.1);
+            border-color: #0F766E;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
         }
 
         .btn-connexion {
             width: 100%;
             padding: 14px;
-            background: #00C4A7;
+            background: #0F766E;
             color: #FFFFFF;
             border: none;
             border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
         }
 
         .btn-connexion:hover {
-            background: #0F766E;
+            background: #0D9488;
+        }
+
+        .btn-connexion:active {
+            transform: scale(0.98);
         }
 
         .alert {
-            padding: 12px;
+            padding: 12px 16px;
             border-radius: 6px;
             margin-bottom: 20px;
             display: none;
+            font-size: 14px;
         }
 
         .alert.error {
             background: #FEF2F2;
             color: #DC2626;
+            border: 1px solid #FECACA;
             display: block;
+        }
+
+        .alert.success {
+            background: #F0FDF4;
+            color: #166534;
+            border: 1px solid #BBF7D0;
+            display: block;
+        }
+
+        .info-demo {
+            margin-top: 24px;
+            padding: 16px;
+            background: #F8FAFC;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #64748B;
+            line-height: 1.6;
+        }
+
+        .info-demo strong {
+            color: #0F766E;
         }
 
         /* 📱 Responsive */
@@ -176,11 +210,13 @@
 <body>
 
     <!-- 🌍 Partie gauche : Illustration -->
-        <!-- 🌍 Partie gauche : Illustration -->
     <div class="illustration">
-        <img src="assets/illustration-connexion.png" alt="SGPE — Système de Gestion du Patrimoine de l'État">
+        <div class="illustration-content">
+            <div class="globe">🏛️</div>
+            <h2>Système de Gestion du Patrimoine de l'État</h2>
+            <p>Gérez efficacement les biens et actifs publics — centralisation, suivi et traçabilité en toute simplicité.</p>
+        </div>
     </div>
-
 
     <!-- 🔐 Partie droite : Formulaire de connexion -->
     <div class="login-container">
@@ -205,45 +241,61 @@
                 </div>
                 <button type="submit" id="submitBtn" class="btn-connexion">Se connecter</button>
             </form>
+
+            <div class="info-demo">
+                <strong>Identifiants de démonstration :</strong><br>
+                Email : admin@gouv.tg<br>
+                Mot de passe : admin123
+            </div>
         </div>
     </div>
 
-    <script type="module">
-        import ApiClient from './js/api.js';
-        const api = new ApiClient('admin');
-
-        const form = document.getElementById('loginForm');
-        const alertBox = document.getElementById('alert');
-        const submitBtn = document.getElementById('submitBtn');
-
-        function showAlert(message, type = 'error') {
-            alertBox.textContent = message;
-            alertBox.className = `alert ${type}`;
-            setTimeout(() => { alertBox.style.display = 'none'; }, 5000);
-        }
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Connexion...';
-            alertBox.style.display = 'none';
-
-            const formData = {
-                email: document.getElementById('email').value,
-                mot_de_passe: document.getElementById('password').value
-            };
-
-            const result = await api.post('/login', formData);
-
-            if (result.success) {
-                localStorage.setItem('auth_token', result.data.token);
-                localStorage.setItem('auth_user', JSON.stringify(result.data.utilisateur));
-                window.location.href = 'dashboard.html';
-            } else {
-                showAlert(result.message || 'Échec de la connexion');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Se connecter';
-            }
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginForm');
+            const alertDiv = document.getElementById('alert');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Cacher l'alerte précédente
+                alertDiv.style.display = 'none';
+                alertDiv.className = 'alert';
+                
+                const email = document.getElementById('email').value.trim();
+                const motDePasse = document.getElementById('password').value;
+                
+                // Vérification des champs
+                if (!email || !motDePasse) {
+                    alertDiv.textContent = 'Veuillez remplir tous les champs.';
+                    alertDiv.classList.add('error');
+                    return;
+                }
+                
+                // Identifiants de démo
+                if (email === 'admin@gouv.tg' && motDePasse === 'admin123') {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Connexion en cours...';
+                    
+                    // Enregistrer la session
+                    localStorage.setItem('utilisateur', JSON.stringify({
+                        nom: 'Admin',
+                        prenom: 'SGPE',
+                        email: email,
+                        role: 'admin'
+                    }));
+                    localStorage.setItem('connecte', 'oui');
+                    
+                    // Redirection après une courte pause
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 600);
+                } else {
+                    alertDiv.textContent = '❌ Identifiants incorrects. Veuillez vérifier votre email et votre mot de passe.';
+                    alertDiv.classList.add('error');
+                }
+            });
         });
     </script>
 </body>

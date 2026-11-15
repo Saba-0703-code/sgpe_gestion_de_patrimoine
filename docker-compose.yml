@@ -25,10 +25,12 @@ services:
     networks:
       - sgpe-reseau
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sgpe_user -d db_biens"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+     test: ["CMD-SHELL", "pg_isready -U ostgres"]
+     interval: 15s
+     timeout: 10s
+     retries: 3
+     start_period: 30s
+
 
   db-gestion:
     image: postgres:17-alpine
@@ -45,10 +47,11 @@ services:
     networks:
       - sgpe-reseau
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sgpe_user -d db_gestion"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+     test: ["CMD-SHELL", "pg_isready -U ostgres"]
+     interval: 15s
+     timeout: 10s
+     retries: 3
+     start_period: 30s
 
   db-admin:
     image: postgres:17-alpine
@@ -65,11 +68,11 @@ services:
     networks:
       - sgpe-reseau
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sgpe_user -d db_admin"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
+     test: ["CMD-SHELL", "pg_isready -U ostgres"]
+     interval: 15s
+     timeout: 10s
+     retries: 3
+     start_period: 30s
   service-biens:
     build:
       context: ./service-biens

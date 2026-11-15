@@ -1,132 +1,117 @@
-<style>
-    .badge {
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        color: white;
-    }
-    .bg-success { background: #10b981; }
-    .bg-primary { background: #3b82f6; }
-    .bg-warning { background: #f59e0b; }
-    .bg-danger { background: #ef4444; }
-    
-    .btn {
-        padding: 6px 10px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        margin: 0 2px;
-        font-size: 14px;
-    }
-    .btn-info { background: #06b6d4; color: white; }
-    .btn-warning { background: #f59e0b; color: #1f2937; }
-    .btn-danger { background: #ef4444; color: white; }
-</style>
-
-<!-- Avant la fin </body> -->
-<script type="module">
-    import ApiClient from './js/api.js';
-    const api = new ApiClient('biens');
-
-    let biens = [];
-
-    async function chargerBiens() {
-        const searchInput = document.getElementById('search');
-        const params = {};
-        if (searchInput?.value) params.search = searchInput.value;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventaire des Biens — SGPE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #F0F4F8; display: flex; min-height: 100vh; }
         
-        const result = await api.get('/biens', params);
-        if (result.success) {
-            biens = result.data.data || result.data;
-            afficherBiens();
-        } else {
-            console.error('Erreur chargement biens:', result.message);
+        /* Barre latérale */
+        .sidebar { width: 260px; background: #00C4A7; color: white; padding: 24px; position: fixed; height: 100vh; }
+        .sidebar h2 { font-size: 20px; margin-bottom: 40px; }
+        .sidebar nav a { display: block; color: white; padding: 12px 16px; margin: 4px 0; border-radius: 8px; text-decoration: none; }
+        .sidebar nav a:hover, .sidebar nav a.active { background: rgba(255,255,255,0.2); }
+        
+        /* Contenu principal */
+        .main { margin-left: 260px; flex: 1; padding: 32px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-primary { background: #00C4A7; color: white; }
+        
+        /* Tableau */
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #E2E8F0; }
+        th { background: #F8FAFC; font-weight: 600; color: #475569; }
+        tr:hover { background: #F8FAFC; }
+        
+        /* Badges */
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+        .badge-success { background: #D1FAE5; color: #065F46; }
+        .badge-warning { background: #FEF3C7; color: #92400E; }
+        .badge-info { background: #DBEAFE; color: #1E40AF; }
+    </style>
+</head>
+<body>
+
+    <!-- Barre latérale -->
+    <aside class="sidebar">
+        <h2>🏛️ SGPE</h2>
+        <nav>
+            <a href="dashboard.html">📊 Tableau de bord</a>
+            <a href="biens.html" class="active">📦 Inventaire des Biens</a>
+            <a href="gestion.html">👥 Gestion</a>
+            <a href="utilisateurs.html">👤 Utilisateurs</a>
+            <a href="#" onclick="deconnecter()">🚪 Déconnexion</a>
+        </nav>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="main">
+        <div class="header">
+            <div>
+                <h1>Inventaire des Biens</h1>
+                <p>Liste complète du patrimoine de l'État</p>
+            </div>
+            <button class="btn btn-primary" onclick="alert('Formulaire d\\'ajout — Fonctionnel en mode démo !')">+ Ajouter un bien</button>
+        </div>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Désignation</th>
+                        <th>Catégorie</th>
+                        <th>État</th>
+                        <th>Localisation</th>
+                        <th>Valeur</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Les données s'affichent ici automatiquement -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="js/demo-data.js"></script>
+    <script>
+        // Vérifier la connexion
+        if (!localStorage.getItem('connecte')) {
+            window.location.href = 'login.html';
         }
-    }
 
-    function afficherBiens() {
-        const tbody = document.querySelector('#table-biens tbody');
-        if (!tbody) return;
-        tbody.innerHTML = '';
-        
-        if (biens.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:#6b7280;">Aucun bien enregistré</td></tr>';
-            return;
+        // Charger et afficher les données
+        document.addEventListener('DOMContentLoaded', function() {
+            const biens = JSON.parse(localStorage.getItem('biens')) || [];
+            const tbody = document.getElementById('table-body');
+            
+            tbody.innerHTML = '';
+            biens.forEach(bien => {
+                let badgeClass = 'badge-success';
+                if (bien.etat === 'Moyen') badgeClass = 'badge-warning';
+                if (bien.etat === 'Dégradé') badgeClass = 'badge-info';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${bien.designation}</strong></td>
+                        <td>${bien.categorie}</td>
+                        <td><span class="badge ${badgeClass}">${bien.etat}</span></td>
+                        <td>${bien.localisation}</td>
+                        <td>${bien.valeur}</td>
+                    </tr>
+                `;
+            });
+        });
+
+        // Déconnexion
+        function deconnecter() {
+            localStorage.removeItem('connecte');
+            localStorage.removeItem('utilisateur');
+            window.location.href = 'login.html';
         }
-        
-        biens.forEach(b => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${b.id}</td>
-                <td>${b.designation || '-'}</td>
-                <td>${b.categorie || '-'}</td>
-                <td>${b.marque || '-'} ${b.modele || ''}</td>
-                <td>${b.numero_serie || '-'}</td>
-                <td>${b.date_achat || '-'}</td>
-                <td>${b.valeur ? Number(b.valeur).toLocaleString('fr-FR') + ' FCFA' : '-'}</td>
-                <td>
-                    <span class="badge ${
-                        b.etat === 'Neuf' ? 'bg-success' :
-                        b.etat === 'Bon' ? 'bg-primary' :
-                        b.etat === 'Moyen' ? 'bg-warning' : 'bg-danger'
-                    }">${b.etat || '-'}</span>
-                </td>
-                <td>
-                    <button class="btn btn-sm btn-info btn-voir" data-id="${b.id}">👁️</button>
-                    <button class="btn btn-sm btn-warning btn-modifier" data-id="${b.id}">✏️</button>
-                    <button class="btn btn-sm btn-danger btn-supprimer" data-id="${b.id}">🗑️</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        // Attacher les événements
-        document.querySelectorAll('.btn-voir').forEach(btn => {
-            btn.addEventListener('click', (e) => voirBien(e.target.dataset.id));
-        });
-        document.querySelectorAll('.btn-modifier').forEach(btn => {
-            btn.addEventListener('click', (e) => modifierBien(e.target.dataset.id));
-        });
-        document.querySelectorAll('.btn-supprimer').forEach(btn => {
-            btn.addEventListener('click', (e) => supprimerBien(e.target.dataset.id));
-        });
-    }
-
-    function voirBien(id) {
-        window.location.href = `bien-detail.html?id=${id}`;
-    }
-
-    function modifierBien(id) {
-        window.location.href = `bien-detail.html?id=${id}&edit=1`;
-    }
-
-    async function supprimerBien(id) {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce bien ?')) return;
-        
-        const result = await api.delete(`/biens/${id}`);
-        if (result.success) {
-            alert('✅ Bien supprimé avec succès');
-            chargerBiens();
-        } else {
-            alert(`❌ ${result.message || 'Erreur lors de la suppression'}`);
-        }
-    }
-
-    function debounce(func, wait) {
-        let timeout;
-        return (...args) => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), wait);
-        };
-    }
-
-    // Événements
-    document.getElementById('search')?.addEventListener('input', debounce(chargerBiens, 300));
-    
-    document.getElementById('btn-ajouter')?.addEventListener('click', () => {
-        window.location.href = 'bien-detail.html?new=1';
-    });
-
-    // Au chargement
-    document.addEventListener('DOMContentLoaded', chargerBiens);
-</script>
+    </script>
+</body>
+</html>

@@ -6,46 +6,163 @@
     <title>SGPE — Fiche du Bien</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        :root { --primaire: #00a896; --foncee: #008080; --claire: #e6f7f5; --texte: #334443; --gris: #f4f6f6; --gris-fonce: #888; }
+        :root { 
+            --primaire: #00a896; 
+            --foncee: #008080; 
+            --claire: #e6f7f5; 
+            --texte: #334443; 
+            --gris: #f4f6f6; 
+            --gris-fonce: #888; 
+        }
         body { display: flex; min-height: 100vh; background: var(--gris); }
-        .sidebar { width: 260px; background: white; border-right: 1px solid #e0e0e0; padding: 20px 0; position: fixed; height: 100vh; }
-        .sidebar .logo { padding: 20px 25px; font-size: 22px; font-weight: bold; color: var(--foncee); border-bottom: 1px solid #eee; margin-bottom: 15px; }
-        .sidebar nav a { display: flex; align-items: center; padding: 14px 25px; color: var(--texte); text-decoration: none; }
-        .sidebar nav a.actif { background: var(--claire); color: var(--primaire); border-left: 4px solid var(--primaire); }
-        .sidebar nav a:hover:not(.actif) { background: #f0f0f0; }
+        
+        /* Barre latérale */
+        .sidebar { 
+            width: 260px; 
+            background: white; 
+            border-right: 1px solid #e0e0e0; 
+            padding: 20px 0; 
+            position: fixed; 
+            height: 100vh; 
+        }
+        .sidebar .logo { 
+            padding: 20px 25px; 
+            font-size: 22px; 
+            font-weight: bold; 
+            color: var(--foncee); 
+            border-bottom: 1px solid #eee; 
+            margin-bottom: 15px; 
+        }
+        .sidebar nav a { 
+            display: flex; 
+            align-items: center; 
+            padding: 14px 25px; 
+            color: var(--texte); 
+            text-decoration: none; 
+        }
+        .sidebar nav a:hover { background: #f0f0f0; }
         .sidebar nav a span { margin-left: 10px; }
+
+        /* Contenu principal */
         .contenu { flex: 1; margin-left: 260px; padding: 25px; }
-        .entete { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
-        .entete h1 { font-size: 26px; color: var(--texte); }
-        .retour { color: var(--primaire); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 15px; }
+        .retour { 
+            color: var(--primaire); 
+            text-decoration: none; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 5px; 
+            margin-bottom: 15px; 
+        }
         .retour:hover { text-decoration: underline; }
-        .btn { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; text-decoration: none; display: inline-block; }
-        .btn-primaire { background: var(--primaire); color: white; }
-        .btn-primaire:hover { background: #009484; }
+        .entete { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+        }
+        .entete h1 { font-size: 24px; color: var(--texte); }
+        .btn { 
+            padding: 10px 18px; 
+            border-radius: 6px; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 500; 
+            text-decoration: none; 
+            display: inline-block; 
+            margin-left: 8px;
+        }
         .btn-secondaire { background: #e0e0e0; color: var(--texte); }
         .btn-danger { background: #e53935; color: white; }
-        .fiche-container { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; margin-bottom: 30px; }
-        .carte { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .carte h2 { font-size: 18px; color: var(--texte); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-        .photo-placeholder { background: var(--gris); border-radius: 8px; height: 200px; display: flex; align-items: center; justify-content: center; color: var(--gris-fonce); font-size: 48px; margin-bottom: 15px; }
-        .info-row { display: flex; padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
-        .info-label { width: 140px; font-weight: 500; color: var(--gris-fonce); }
+
+        /* Conteneur de la fiche */
+        .fiche-container { 
+            display: grid; 
+            grid-template-columns: 1fr 2fr; 
+            gap: 25px; 
+            margin-bottom: 30px; 
+        }
+        .carte { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
+        }
+        .carte h2 { 
+            font-size: 18px; 
+            color: var(--texte); 
+            margin-bottom: 20px; 
+            padding-bottom: 10px; 
+            border-bottom: 1px solid #eee; 
+        }
+        .photo-placeholder { 
+            background: var(--gris); 
+            border-radius: 8px; 
+            height: 200px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--gris-fonce); 
+            font-size: 48px; 
+            margin-bottom: 15px; 
+        }
+        .info-row { 
+            display: flex; 
+            padding: 10px 0; 
+            border-bottom: 1px solid #f5f5f5; 
+        }
+        .info-label { 
+            width: 140px; 
+            font-weight: 500; 
+            color: var(--gris-fonce); 
+        }
         .info-value { flex: 1; color: var(--texte); }
-        .etat { padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; display: inline-block; }
+        .etat { 
+            padding: 4px 12px; 
+            border-radius: 20px; 
+            font-size: 13px; 
+            font-weight: 500; 
+            display: inline-block; 
+        }
         .etat.bon { background: #e8f5e9; color: #2e7d32; }
         .etat.moyen { background: #fff8e1; color: #f57c00; }
         .etat.mauvais { background: #ffebee; color: #c62828; }
-        .onglets { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 1px solid #ddd; }
-        .onglet { padding: 12px 25px; cursor: pointer; border-bottom: 3px solid transparent; color: var(--gris-fonce); }
-        .onglet.actif { border-bottom-color: var(--primaire); color: var(--primaire); font-weight: 600; }
+
+        /* Onglets */
+        .onglets { 
+            display: flex; 
+            gap: 5px; 
+            margin-bottom: 20px; 
+            border-bottom: 1px solid #ddd; 
+        }
+        .onglet { 
+            padding: 12px 25px; 
+            cursor: pointer; 
+            border-bottom: 3px solid transparent; 
+            color: var(--gris-fonce); 
+        }
+        .onglet.actif { 
+            border-bottom-color: var(--primaire); 
+            color: var(--primaire); 
+            font-weight: 600; 
+        }
         .onglet-contenu { display: none; }
         .onglet-contenu.actif { display: block; }
-        table { width: 100%; border-collapse: collapse; }
-        table th, table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        .onglet-contenu p { line-height: 1.6; color: var(--texte); }
+
+        /* Tableau historique */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        table th, table td { 
+            padding: 12px 10px; 
+            text-align: left; 
+            border-bottom: 1px solid #eee; 
+            font-size: 14px; 
+        }
         table th { background: #fafafa; color: #666; font-weight: 600; }
         .vide { text-align: center; padding: 30px; color: var(--gris-fonce); }
-        .utilisateur { display: flex; align-items: center; gap: 10px; }
-        .deconnexion { padding: 8px 16px; background: #e53935; color: white; border: none; border-radius: 6px; cursor: pointer; }
+
+        /* Responsive */
         @media(max-width: 900px) {
             .sidebar { width: 70px; }
             .sidebar .logo { font-size: 0; padding: 20px 5px; }
@@ -56,6 +173,19 @@
     </style>
 </head>
 <body>
+    <!-- Vérification de connexion -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const connecte = localStorage.getItem('connecte');
+            if (!connecte || connecte !== 'oui') {
+                alert('Veuillez vous connecter d\'abord');
+                window.location.href = 'login.html';
+                return;
+            }
+        });
+    </script>
+
+    <!-- Barre latérale -->
     <aside class="sidebar">
         <div class="logo">SGPE</div>
         <nav>
@@ -68,6 +198,7 @@
         </nav>
     </aside>
 
+    <!-- Contenu principal -->
     <main class="contenu">
         <a href="inventaire.html" class="retour">← Retour à l'inventaire</a>
         
@@ -75,7 +206,7 @@
             <h1 id="titre-bien">EQ-024 — Ordinateur portable</h1>
             <div>
                 <a href="ajouter-bien.html" class="btn btn-secondaire">✏️ Modifier</a>
-                <button class="btn btn-danger">🗑️ Supprimer</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Fonction de suppression en mode démo')">🗑️ Supprimer</button>
             </div>
         </div>
 
@@ -127,9 +258,13 @@
                 <!-- Onglet Description -->
                 <div id="description" class="onglet-contenu actif">
                     <h2>Description</h2>
-                    <p id="f-desc" style="line-height: 1.6; color: var(--texte);">
-                        Ordinateur portable de marque Dell, modèle Latitude 5420.<br>
-                        Processeur Intel Core i5, 16Go RAM, 512Go SSD.<br>
+                    <p id="f-desc">
+                        Ordinateur portable de marque Dell, modèle Latitude 5420.<br><br>
+                        <strong>Caractéristiques :</strong><br>
+                        • Processeur : Intel Core i5<br>
+                        • Mémoire RAM : 16 Go<br>
+                        • Stockage : 512 Go SSD<br>
+                        • Système d'exploitation : Windows 11 Pro<br><br>
                         Acheté neuf en mars 2025 pour les besoins du service financier.
                     </p>
                 </div>
@@ -181,24 +316,18 @@
     </main>
 
     <script>
-        function verifierConnexion() {
-            if (!localStorage.getItem('token')) {
-                window.location.href = 'login.html';
-            }
-        }
-
         // Gestion des onglets
         document.querySelectorAll('.onglet').forEach(onglet => {
             onglet.addEventListener('click', function() {
+                // Retirer la classe actif de tous les onglets
                 document.querySelectorAll('.onglet').forEach(o => o.classList.remove('actif'));
                 document.querySelectorAll('.onglet-contenu').forEach(c => c.classList.remove('actif'));
                 
+                // Activer l'onglet cliqué
                 this.classList.add('actif');
                 document.getElementById(this.dataset.onglet).classList.add('actif');
             });
         });
-
-        verifierConnexion();
     </script>
 </body>
 </html>

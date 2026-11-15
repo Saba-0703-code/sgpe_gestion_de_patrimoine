@@ -2,9 +2,9 @@
 const API_CONFIG = {
     baseURL: 'http://localhost',
     ports: {
-        biens: 9001,
-        gestion: 9002,
-        admin: 9003
+        biens: 8001,
+        gestion: 8002,
+        admin: 8003
     }
 };
 

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,36 +6,143 @@
     <title>SGPE — Ajouter un Bien</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        :root { --primaire: #00a896; --foncee: #008080; --claire: #e6f7f5; --texte: #334443; --gris: #f4f6f6; --gris-fonce: #888; --erreur: #e53935; }
+        :root { 
+            --primaire: #00a896; 
+            --foncee: #008080; 
+            --claire: #e6f7f5; 
+            --texte: #334443; 
+            --gris: #f4f6f6; 
+            --gris-fonce: #888; 
+            --erreur: #e53935; 
+        }
         body { display: flex; min-height: 100vh; background: var(--gris); }
-        .sidebar { width: 260px; background: white; border-right: 1px solid #e0e0e0; padding: 20px 0; position: fixed; height: 100vh; }
-        .sidebar .logo { padding: 20px 25px; font-size: 22px; font-weight: bold; color: var(--foncee); border-bottom: 1px solid #eee; margin-bottom: 15px; }
-        .sidebar nav a { display: flex; align-items: center; padding: 14px 25px; color: var(--texte); text-decoration: none; }
-        .sidebar nav a.actif { background: var(--claire); color: var(--primaire); border-left: 4px solid var(--primaire); }
+        
+        /* Barre latérale */
+        .sidebar { 
+            width: 260px; 
+            background: white; 
+            border-right: 1px solid #e0e0e0; 
+            padding: 20px 0; 
+            position: fixed; 
+            height: 100vh; 
+        }
+        .sidebar .logo { 
+            padding: 20px 25px; 
+            font-size: 22px; 
+            font-weight: bold; 
+            color: var(--foncee); 
+            border-bottom: 1px solid #eee; 
+            margin-bottom: 15px; 
+        }
+        .sidebar nav a { 
+            display: flex; 
+            align-items: center; 
+            padding: 14px 25px; 
+            color: var(--texte); 
+            text-decoration: none; 
+        }
+        .sidebar nav a.actif { 
+            background: var(--claire); 
+            color: var(--primaire); 
+            border-left: 4px solid var(--primaire); 
+        }
         .sidebar nav a:hover:not(.actif) { background: #f0f0f0; }
         .sidebar nav a span { margin-left: 10px; }
+
+        /* Contenu principal */
         .contenu { flex: 1; margin-left: 260px; padding: 25px; }
-        .entete { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .entete { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+        }
         .entete h1 { font-size: 26px; color: var(--texte); }
-        .btn { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; text-decoration: none; display: inline-block; }
+        .utilisateur { display: flex; align-items: center; gap: 10px; }
+        .deconnexion { 
+            padding: 8px 16px; 
+            background: #e53935; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+        }
+
+        /* Formulaire */
+        .form-container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
+            max-width: 800px; 
+        }
+        .form-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+        }
+        .form-group { margin-bottom: 18px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            color: var(--texte); 
+            font-weight: 500; 
+            font-size: 14px; 
+        }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; 
+            padding: 12px 14px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            font-size: 14px; 
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { 
+            outline: none; 
+            border-color: var(--primaire); 
+        }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+
+        /* Boutons */
+        .btn { 
+            padding: 10px 18px; 
+            border-radius: 6px; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 500; 
+            text-decoration: none; 
+            display: inline-block; 
+        }
         .btn-primaire { background: var(--primaire); color: white; }
         .btn-primaire:hover { background: #009484; }
         .btn-secondaire { background: #e0e0e0; color: var(--texte); }
         .btn-annuler { background: #f0f0f0; color: #666; }
-        .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); max-width: 800px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-group { margin-bottom: 18px; }
-        .form-group.full-width { grid-column: 1 / -1; }
-        .form-group label { display: block; margin-bottom: 8px; color: var(--texte); font-weight: 500; font-size: 14px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primaire); }
-        .form-group textarea { min-height: 100px; resize: vertical; }
-        .actions-form { margin-top: 25px; display: flex; gap: 12px; justify-content: flex-end; }
-        .message { margin-top: 15px; padding: 12px; border-radius: 6px; display: none; }
-        .message.succes { background: #e8f5e9; color: #2e7d32; display: block; }
-        .message.erreur { background: #ffebee; color: #c62828; display: block; }
-        .utilisateur { display: flex; align-items: center; gap: 10px; }
-        .deconnexion { padding: 8px 16px; background: #e53935; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .actions-form { 
+            margin-top: 25px; 
+            display: flex; 
+            gap: 12px; 
+            justify-content: flex-end; 
+        }
+
+        /* Messages */
+        .message { 
+            margin-top: 15px; 
+            padding: 12px; 
+            border-radius: 6px; 
+            display: none; 
+        }
+        .message.succes { 
+            background: #e8f5e9; 
+            color: #2e7d32; 
+            display: block; 
+        }
+        .message.erreur { 
+            background: #ffebee; 
+            color: #c62828; 
+            display: block; 
+        }
+
+        /* Responsive */
         @media(max-width: 768px) {
             .sidebar { width: 70px; }
             .sidebar .logo { font-size: 0; padding: 20px 5px; }
@@ -47,6 +153,25 @@
     </style>
 </head>
 <body>
+    <!-- Vérification de connexion -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const connecte = localStorage.getItem('connecte');
+            if (!connecte || connecte !== 'oui') {
+                alert('Veuillez vous connecter d\'abord');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Afficher le nom de l'utilisateur
+            const utilisateur = JSON.parse(localStorage.getItem('utilisateur') || '{}');
+            if (utilisateur.prenom && utilisateur.nom) {
+                document.getElementById('nom-utilisateur').textContent = utilisateur.prenom + ' ' + utilisateur.nom;
+            }
+        });
+    </script>
+
+    <!-- Barre latérale -->
     <aside class="sidebar">
         <div class="logo">SGPE</div>
         <nav>
@@ -59,11 +184,12 @@
         </nav>
     </aside>
 
+    <!-- Contenu principal -->
     <main class="contenu">
         <div class="entete">
             <h1 id="titre-page">Ajouter un Bien</h1>
             <div class="utilisateur">
-                <span id="nom-utilisateur">Admin</span>
+                <span id="nom-utilisateur">Utilisateur</span>
                 <button class="deconnexion" onclick="deconnecter()">Déconnexion</button>
             </div>
         </div>
@@ -134,66 +260,56 @@
     </main>
 
     <script>
-        const API_URL = "http://localhost:8000//api";
         const form = document.getElementById('form-bien');
         const messageDiv = document.getElementById('message');
 
-        function verifierConnexion() {
-            if (!localStorage.getItem('token')) {
-                window.location.href = 'login.html';
-            }
-            const u = JSON.parse(localStorage.getItem('utilisateur') || '{}');
-            document.getElementById('nom-utilisateur').textContent = u.prenom + ' ' + u.nom;
-        }
-
         function deconnecter() {
-            localStorage.clear();
+            localStorage.removeItem('connecte');
+            localStorage.removeItem('utilisateur');
             window.location.href = 'login.html';
         }
 
-        form.addEventListener('submit', async function(e) {
+        // Charger les biens depuis localStorage ou initialiser
+        function getBiens() {
+            return JSON.parse(localStorage.getItem('biens')) || [];
+        }
+
+        function sauvegarderBien(nouveauBien) {
+            const biens = getBiens();
+            biens.push(nouveauBien);
+            localStorage.setItem('biens', JSON.stringify(biens));
+        }
+
+        // Soumission du formulaire
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
             messageDiv.style.display = 'none';
 
-            const donnees = {
+            const nouveauBien = {
+                id: Date.now(),
                 reference: document.getElementById('reference').value,
-                nom: document.getElementById('nom').value,
+                designation: document.getElementById('nom').value,
                 categorie: document.getElementById('categorie').value,
                 etat: document.getElementById('etat').value,
-                valeur: document.getElementById('valeur').value,
-                date_acquisition: document.getElementById('date_acquisition').value,
+                valeur: parseInt(document.getElementById('valeur').value).toLocaleString('fr-FR') + ' FCFA',
+                date_achat: document.getElementById('date_acquisition').value,
                 localisation: document.getElementById('localisation').value,
                 description: document.getElementById('description').value
             };
 
-            try {
-                const reponse = await fetch(`${API_URL}/biens`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
-                    body: JSON.stringify(donnees)
-                });
+            // Enregistrer en mémoire locale
+            sauvegarderBien(nouveauBien);
 
-                if (reponse.ok) {
-                    messageDiv.textContent = "✅ Bien enregistré avec succès !";
-                    messageDiv.className = "message succes";
-                    form.reset();
-                    setTimeout(() => window.location.href = 'inventaire.html', 1500);
-                } else {
-                    const err = await reponse.json();
-                    throw new Error(err.message || "Erreur lors de l'enregistrement");
-                }
-            } catch (erreur) {
-                // Mode démo
-                messageDiv.textContent = "✅ (Démo) Bien enregistré ! Redirection...";
-                messageDiv.className = "message succes";
-                setTimeout(() => window.location.href = 'inventaire.html', 1500);
-            }
+            // Message de succès
+            messageDiv.textContent = "✅ Bien enregistré avec succès ! Redirection vers l'inventaire...";
+            messageDiv.className = "message succes";
+
+            // Réinitialiser et rediriger
+            setTimeout(() => {
+                form.reset();
+                window.location.href = 'inventaire.html';
+            }, 1500);
         });
-
-        verifierConnexion();
     </script>
 </body>
 </html>

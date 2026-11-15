@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,110 +6,328 @@
     <title>Mon Profil — SGPE</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f0f4f8; min-height: 100vh; }
-        .header { background: #1e3a8a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 1.25rem; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 1.5rem; font-size: 0.95rem; }
-        .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-        .card { background: white; border-radius: 10px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .card h2 { color: #1e3a8a; margin-bottom: 1.5rem; font-size: 1.4rem; }
-        .avatar-section { text-align: center; margin-bottom: 2rem; }
-        .avatar { width: 100px; height: 100px; border-radius: 50%; background: #bfdbfe; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #1e3a8a; margin: 0 auto 1rem; }
-        .form-group { margin-bottom: 1.2rem; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #374151; font-size: 0.9rem; }
-        input, select, textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem; }
-        input:focus { outline: none; border-color: #1e3a8a; }
-        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; text-decoration: none; display: inline-block; }
-        .btn-primary { background: #1e3a8a; color: white; }
-        .btn-primary:hover { background: #1e2d6b; }
-        .btn-secondary { background: #e5e7eb; color: #374151; margin-left: 0.75rem; }
-        .btn-secondary:hover { background: #d1d5db; }
-        .btn-danger { background: #dc2626; color: white; }
-        .btn-danger:hover { background: #b91c1c; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .info-text { color: #6b7280; font-size: 0.85rem; margin-top: 0.25rem; }
-        .separator { height: 1px; background: #e5e7eb; margin: 2rem 0; }
+        :root {
+            --primaire: #00a896; --foncee: #008080; --claire: #e6f7f5;
+            --texte: #334443; --gris: #f4f6f6; --gris-fonce: #888;
+            --erreur: #dc2626; --succes: #16a34a;
+        }
+        body { display: flex; min-height: 100vh; background: var(--gris); }
+
+        /* Barre latérale */
+        .sidebar {
+            width: 260px; background: white; border-right: 1px solid #e0e0e0;
+            padding: 20px 0; position: fixed; height: 100vh;
+        }
+        .sidebar .logo {
+            padding: 20px 25px; font-size: 22px; font-weight: bold;
+            color: var(--foncee); border-bottom: 1px solid #eee; margin-bottom: 15px;
+        }
+        .sidebar nav a {
+            display: flex; align-items: center; padding: 14px 25px;
+            color: var(--texte); text-decoration: none; transition: background 0.2s;
+        }
+        .sidebar nav a.actif {
+            background: var(--claire); color: var(--primaire);
+            border-left: 4px solid var(--primaire);
+        }
+        .sidebar nav a:hover:not(.actif) { background: #f0f0f0; }
+        .sidebar nav a span { margin-left: 10px; }
+
+        /* Contenu principal */
+        .contenu { flex: 1; margin-left: 260px; padding: 25px; }
+        .entete {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px; flex-wrap: wrap; gap: 15px;
+        }
+        .entete h1 { font-size: 26px; color: var(--texte); }
+        .utilisateur { display: flex; align-items: center; gap: 10px; }
+        .deconnexion {
+            padding: 8px 16px; background: var(--erreur); color: white;
+            border: none; border-radius: 6px; cursor: pointer;
+        }
+
+        .container { max-width: 700px; margin: 0 auto; }
+        .card {
+            background: white; border-radius: 12px; padding: 32px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        .card h2 {
+            color: var(--foncee); margin-bottom: 30px; font-size: 22px;
+            text-align: center;
+        }
+
+        .avatar-section { text-align: center; margin-bottom: 32px; }
+        .avatar {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: var(--claire); display: flex; align-items: center;
+            justify-content: center; font-size: 40px; color: var(--primaire);
+            margin: 0 auto 12px;
+        }
+        .avatar-section h3 { font-size: 20px; color: var(--texte); margin-bottom: 4px; }
+        .avatar-section p { color: var(--gris-fonce); font-size: 14px; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { margin-bottom: 20px; }
+        label {
+            display: block; margin-bottom: 8px; font-weight: 500;
+            color: var(--texte); font-size: 14px;
+        }
+        input, select, textarea {
+            width: 100%; padding: 12px 16px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 15px;
+        }
+        input:focus {
+            outline: none; border-color: var(--primaire);
+            box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.1);
+        }
+        input[readonly] { background: var(--gris); color: var(--gris-fonce); cursor: not-allowed; }
+
+        .separator { height: 1px; background: #eee; margin: 28px 0; }
+        .card h4 { font-size: 16px; color: var(--texte); margin-bottom: 20px; }
+
+        .btn-group { margin-top: 24px; text-align: right; display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+        .btn {
+            padding: 12px 24px; border: none; border-radius: 6px;
+            font-size: 15px; font-weight: 500; cursor: pointer;
+            text-decoration: none; display: inline-block;
+            transition: background 0.2s;
+        }
+        .btn-primaire { background: var(--primaire); color: white; }
+        .btn-primaire:hover { background: var(--foncee); }
+        .btn-secondaire { background: #e5e7eb; color: var(--texte); }
+        .btn-secondaire:hover { background: #d1d5db; }
+
+        .message { margin-top: 16px; padding: 12px 16px; border-radius: 6px; display: none; font-size: 14px; }
+        .message.succes { background: #e8f5e9; color: #2e7d32; display: none; }
+        .message.erreur { background: #fee2e2; color: #dc2626; display: none; }
+        .message.visible { display: block; }
+
+        /* Responsive */
+        @media(max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo { font-size: 0; padding: 20px 5px; }
+            .sidebar nav a span { display: none; }
+            .contenu { margin-left: 70px; padding: 15px; }
+            .form-row { grid-template-columns: 1fr; }
+            .card { padding: 20px; }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🏛️ SGPE — Gestion du Patrimoine</h1>
-        <div class="nav-links">
-            <a href="dashboard.html">Tableau de bord</a>
-            <a href="profil.html">Mon profil</a>
-            <a href="login.html">Déconnexion</a>
-        </div>
-    </div>
+    <!-- Vérification de connexion et chargement des données -->
+    <script>
+        let utilisateurConnecte = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const connecte = localStorage.getItem('connecte');
+            if (!connecte || connecte !== 'oui') {
+                alert('Veuillez vous connecter d\'abord');
+                window.location.href = 'login.html';
+                return;
+            }
 
-    <div class="container">
-        <div class="card">
-            <h2>Mon Profil</h2>
+            // Charger les données de l'utilisateur
+            utilisateurConnecte = JSON.parse(localStorage.getItem('utilisateur') || '{}');
+            chargerProfil();
+        });
 
-            <div class="avatar-section">
-                <div class="avatar">👤</div>
-                <h3>Nom Utilisateur</h3>
-                <p style="color: #6b7280; font-size: 0.9rem;">Administrateur</p>
+        function deconnecter() {
+            localStorage.removeItem('connecte');
+            localStorage.removeItem('utilisateur');
+            window.location.href = 'login.html';
+        }
+
+        function chargerProfil() {
+            if (!utilisateurConnecte) return;
+            
+            // Mise à jour de l'affichage du nom dans l'en-tête
+            const nomAffichage = document.getElementById('nom-utilisateur');
+            if (nomAffichage && utilisateurConnecte.prenom && utilisateurConnecte.nom) {
+                nomAffichage.textContent = utilisateurConnecte.prenom + ' ' + utilisateurConnecte.nom;
+            }
+
+            // Remplissage du profil
+            document.getElementById('affichage-nom').textContent = utilisateurConnecte.prenom + ' ' + utilisateurConnecte.nom;
+            document.getElementById('affichage-role').textContent = 
+                utilisateurConnecte.role === 'admin' ? 'Administrateur' : 
+                utilisateurConnecte.role === 'gestion' ? 'Gestionnaire' : 'Utilisateur';
+            
+            document.getElementById('input-nom').value = utilisateurConnecte.nom || '';
+            document.getElementById('input-prenom').value = utilisateurConnecte.prenom || '';
+            document.getElementById('input-email').value = utilisateurConnecte.email || '';
+        }
+
+        function afficherMessage(type, texte) {
+            const message = document.getElementById('message-' + type);
+            const tousMessages = document.querySelectorAll('.message');
+            tousMessages.forEach(m => m.classList.remove('visible'));
+            
+            message.textContent = texte;
+            message.classList.add('visible');
+            
+            setTimeout(() => message.classList.remove('visible'), 4000);
+        }
+
+        function sauvegarderProfil(e) {
+            e.preventDefault();
+            
+            const nom = document.getElementById('input-nom').value.trim();
+            const prenom = document.getElementById('input-prenom').value.trim();
+            const email = document.getElementById('input-email').value.trim();
+            const telephone = document.getElementById('input-telephone').value.trim();
+            const service = document.getElementById('input-service').value.trim();
+            
+            if (!nom || !prenom || !email) {
+                afficherMessage('erreur', '❌ Veuillez remplir les champs obligatoires.');
+                return;
+            }
+            
+            // Mettre à jour dans localStorage
+            utilisateurConnecte.nom = nom;
+            utilisateurConnecte.prenom = prenom;
+            utilisateurConnecte.email = email;
+            utilisateurConnecte.telephone = telephone;
+            utilisateurConnecte.service = service;
+            localStorage.setItem('utilisateur', JSON.stringify(utilisateurConnecte));
+            
+            // Mettre à jour l'affichage
+            chargerProfil();
+            
+            afficherMessage('succes', '✅ Profil mis à jour avec succès !');
+        }
+
+        function changerMotDePasse(e) {
+            e.preventDefault();
+            
+            const actuel = document.getElementById('mdp-actuel').value;
+            const nouveau = document.getElementById('mdp-nouveau').value;
+            const confirmer = document.getElementById('mdp-confirmer').value;
+            
+            if (!actuel || !nouveau || !confirmer) {
+                afficherMessage('erreur-mdp', '❌ Veuillez remplir tous les champs.');
+                return;
+            }
+            
+            if (nouveau.length < 8) {
+                afficherMessage('erreur-mdp', '❌ Le nouveau mot de passe doit contenir au moins 8 caractères.');
+                return;
+            }
+            
+            if (nouveau !== confirmer) {
+                afficherMessage('erreur-mdp', '❌ Les mots de passe ne correspondent pas.');
+                return;
+            }
+            
+            afficherMessage('succes-mdp', '✅ Mot de passe modifié avec succès !');
+            document.getElementById('form-mdp').reset();
+        }
+    </script>
+
+    <!-- Barre latérale -->
+    <aside class="sidebar">
+        <div class="logo">SGPE</div>
+        <nav>
+            <a href="dashboard.html">🏠 <span>Tableau de bord</span></a>
+            <a href="inventaire.html">📋 <span>Inventaire</span></a>
+            <a href="ajouter-bien.html">➕ <span>Ajouter un bien</span></a>
+            <a href="affectations.html">🔄 <span>Affectations</span></a>
+            <a href="utilisateurs.html">👥 <span>Utilisateurs</span></a>
+            <a href="parametres.html">⚙️ <span>Paramètres</span></a>
+            <a href="profil.html" class="actif">👤 <span>Mon Profil</span></a>
+        </nav>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="contenu">
+        <div class="entete">
+            <h1>👤 Mon Profil</h1>
+            <div class="utilisateur">
+                <span id="nom-utilisateur">Utilisateur</span>
+                <button class="deconnexion" onclick="deconnecter()">Déconnexion</button>
             </div>
+        </div>
 
-            <form>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Nom</label>
-                        <input type="text" value="DOE">
-                    </div>
-                    <div class="form-group">
-                        <label>Prénom</label>
-                        <input type="text" value="John">
-                    </div>
+        <div class="container">
+            <div class="card">
+                <h2>Mon Profil</h2>
+
+                <div class="avatar-section">
+                    <div class="avatar">👤</div>
+                    <h3 id="affichage-nom">Utilisateur</h3>
+                    <p id="affichage-role">—</p>
                 </div>
 
-                <div class="form-group">
-                    <label>Adresse email</label>
-                    <input type="email" value="admin@sgpe.tg">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Téléphone</label>
-                        <input type="tel" value="+228 XX XX XX XX">
+                <form onsubmit="sauvegarderProfil(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nom *</label>
+                            <input type="text" id="input-nom" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Prénom *</label>
+                            <input type="text" id="input-prenom" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Service / Direction</label>
-                        <input type="text" value="Direction des Services Informatiques">
-                    </div>
-                </div>
 
-                <div class="form-group">
-                    <label>Profil / Rôle</label>
-                    <input type="text" value="Administrateur" readonly style="background: #f3f4f6;">
-                </div>
+                    <div class="form-group">
+                        <label>Adresse email *</label>
+                        <input type="email" id="input-email" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Téléphone</label>
+                            <input type="tel" id="input-telephone" placeholder="+228 XX XX XX XX">
+                        </div>
+                        <div class="form-group">
+                            <label>Service / Direction</label>
+                            <input type="text" id="input-service" placeholder="Ex: Direction des Services Informatiques">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Profil / Rôle</label>
+                        <input type="text" id="input-role" value="Administrateur" readonly>
+                    </div>
+
+                    <div id="message-succes" class="message succes">✅ Profil mis à jour avec succès !</div>
+                    <div id="message-erreur" class="message erreur">❌ Erreur</div>
+
+                    <div class="btn-group">
+                        <a href="dashboard.html" class="btn btn-secondaire">← Retour</a>
+                        <button type="submit" class="btn btn-primaire">💾 Enregistrer les modifications</button>
+                    </div>
+                </form>
 
                 <div class="separator"></div>
 
-                <h3 style="font-size: 1rem; color: #374151; margin-bottom: 1rem;">Changer mon mot de passe</h3>
-                
-                <div class="form-group">
-                    <label>Mot de passe actuel</label>
-                    <input type="password" placeholder="••••••••">
-                </div>
-
-                <div class="form-row">
+                <h4>🔐 Changer mon mot de passe</h4>
+                <form id="form-mdp" onsubmit="changerMotDePasse(event)">
                     <div class="form-group">
-                        <label>Nouveau mot de passe</label>
-                        <input type="password" placeholder="Au moins 8 caractères">
+                        <label>Mot de passe actuel</label>
+                        <input type="password" id="mdp-actuel" placeholder="••••••••">
                     </div>
-                    <div class="form-group">
-                        <label>Confirmer le mot de passe</label>
-                        <input type="password" placeholder="Répéter le mot de passe">
-                    </div>
-                </div>
 
-                <div style="text-align: right; margin-top: 1.5rem;">
-                    <a href="dashboard.html" class="btn btn-secondary">Annuler</a>
-                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
-                </div>
-            </form>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nouveau mot de passe</label>
+                            <input type="password" id="mdp-nouveau" placeholder="Au moins 8 caractères">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirmer le mot de passe</label>
+                            <input type="password" id="mdp-confirmer" placeholder="Répéter le mot de passe">
+                        </div>
+                    </div>
+
+                    <div id="message-succes-mdp" class="message succes">✅ Mot de passe modifié avec succès !</div>
+                    <div id="message-erreur-mdp" class="message erreur">❌ Erreur</div>
+
+                    <div style="text-align: right; margin-top: 8px;">
+                        <button type="submit" class="btn btn-primaire">🔐 Modifier le mot de passe</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+    </main>
 </body>
 </html>
