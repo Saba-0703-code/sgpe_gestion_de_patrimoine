@@ -115,111 +115,119 @@
 </head>
 <body>
     <!-- Vérification de connexion et chargement des données -->
+    <script src="js/api.js"></script>
     <script>
         let utilisateurConnecte = null;
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            const connecte = localStorage.getItem('connecte');
-            if (!connecte || connecte !== 'oui') {
-                alert('Veuillez vous connecter d\'abord');
-                window.location.href = 'login.html';
-                return;
-            }
 
-            // Charger les données de l'utilisateur
-            utilisateurConnecte = JSON.parse(localStorage.getItem('utilisateur') || '{}');
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!requireAuth()) return;
+            utilisateurConnecte = getUtilisateur();
             chargerProfil();
         });
 
-        function deconnecter() {
-            localStorage.removeItem('connecte');
-            localStorage.removeItem('utilisateur');
-            window.location.href = 'login.html';
-        }
-
         function chargerProfil() {
             if (!utilisateurConnecte) return;
-            
-            // Mise à jour de l'affichage du nom dans l'en-tête
-            const nomAffichage = document.getElementById('nom-utilisateur');
-            if (nomAffichage && utilisateurConnecte.prenom && utilisateurConnecte.nom) {
-                nomAffichage.textContent = utilisateurConnecte.prenom + ' ' + utilisateurConnecte.nom;
-            }
 
-            // Remplissage du profil
-            document.getElementById('affichage-nom').textContent = utilisateurConnecte.prenom + ' ' + utilisateurConnecte.nom;
-            document.getElementById('affichage-role').textContent = 
-                utilisateurConnecte.role === 'admin' ? 'Administrateur' : 
-                utilisateurConnecte.role === 'gestion' ? 'Gestionnaire' : 'Utilisateur';
-            
+            const nomAffichage = document.getElementById('nom-utilisateur');
+            if (nomAffichage) nomAffichage.textContent = afficherUtilisateurNom();
+
+            document.getElementById('affichage-nom').textContent = afficherUtilisateurNom();
+            document.getElementById('affichage-role').textContent = libelleRoleLocal();
+            document.getElementById('input-role').value = libelleRoleLocal();
+
             document.getElementById('input-nom').value = utilisateurConnecte.nom || '';
             document.getElementById('input-prenom').value = utilisateurConnecte.prenom || '';
             document.getElementById('input-email').value = utilisateurConnecte.email || '';
+            document.getElementById('input-telephone').value = utilisateurConnecte.telephone || '';
+        }
+
+        function afficherUtilisateurNom() {
+            return [utilisateurConnecte.prenom, utilisateurConnecte.nom].filter(Boolean).join(' ');
+        }
+
+        function libelleRoleLocal() {
+            return { admin: 'Administrateur', gestionnaire: 'Gestionnaire', utilisateur: 'Utilisateur' }[utilisateurConnecte.role] || 'Utilisateur';
+        }
+
+        function majSession(data) {
+            if (data && data.utilisateur) {
+                utilisateurConnecte = data.utilisateur;
+            } else if (data) {
+                utilisateurConnecte = { ...utilisateurConnecte, ...data };
+            }
+            localStorage.setItem('utilisateur', JSON.stringify(utilisateurConnecte));
+            chargerProfil();
         }
 
         function afficherMessage(type, texte) {
             const message = document.getElementById('message-' + type);
             const tousMessages = document.querySelectorAll('.message');
             tousMessages.forEach(m => m.classList.remove('visible'));
-            
+
             message.textContent = texte;
             message.classList.add('visible');
-            
+
             setTimeout(() => message.classList.remove('visible'), 4000);
         }
 
-        function sauvegarderProfil(e) {
+        async function sauvegarderProfil(e) {
             e.preventDefault();
-            
-            const nom = document.getElementById('input-nom').value.trim();
-            const prenom = document.getElementById('input-prenom').value.trim();
-            const email = document.getElementById('input-email').value.trim();
-            const telephone = document.getElementById('input-telephone').value.trim();
-            const service = document.getElementById('input-service').value.trim();
-            
-            if (!nom || !prenom || !email) {
+
+            const payload = {
+                nom: document.getElementById('input-nom').value.trim(),
+                prenom: document.getElementById('input-prenom').value.trim(),
+                email: document.getElementById('input-email').value.trim(),
+                telephone: document.getElementById('input-telephone').value.trim() || null
+            };
+
+            if (!payload.nom || !payload.prenom || !payload.email) {
                 afficherMessage('erreur', '❌ Veuillez remplir les champs obligatoires.');
                 return;
             }
-            
-            // Mettre à jour dans localStorage
-            utilisateurConnecte.nom = nom;
-            utilisateurConnecte.prenom = prenom;
-            utilisateurConnecte.email = email;
-            utilisateurConnecte.telephone = telephone;
-            utilisateurConnecte.service = service;
-            localStorage.setItem('utilisateur', JSON.stringify(utilisateurConnecte));
-            
-            // Mettre à jour l'affichage
-            chargerProfil();
-            
-            afficherMessage('succes', '✅ Profil mis à jour avec succès !');
+
+            const res = await SGPE.put('admin', '/utilisateurs/' + utilisateurConnecte.id, payload);
+
+            if (res.ok) {
+                majSession(res.data && res.data.data ? res.data.data : res.data);
+                afficherMessage('succes', '✅ Profil mis à jour avec succès !');
+            } else {
+                const msg = (res.data && res.data.message) || 'Erreur lors de la mise à jour.';
+                afficherMessage('erreur', '❌ ' + msg);
+            }
         }
 
-        function changerMotDePasse(e) {
+        async function changerMotDePasse(e) {
             e.preventDefault();
-            
+
             const actuel = document.getElementById('mdp-actuel').value;
             const nouveau = document.getElementById('mdp-nouveau').value;
             const confirmer = document.getElementById('mdp-confirmer').value;
-            
+
             if (!actuel || !nouveau || !confirmer) {
                 afficherMessage('erreur-mdp', '❌ Veuillez remplir tous les champs.');
                 return;
             }
-            
             if (nouveau.length < 8) {
                 afficherMessage('erreur-mdp', '❌ Le nouveau mot de passe doit contenir au moins 8 caractères.');
                 return;
             }
-            
             if (nouveau !== confirmer) {
                 afficherMessage('erreur-mdp', '❌ Les mots de passe ne correspondent pas.');
                 return;
             }
-            
-            afficherMessage('succes-mdp', '✅ Mot de passe modifié avec succès !');
-            document.getElementById('form-mdp').reset();
+
+            const res = await SGPE.put('admin', '/utilisateurs/' + utilisateurConnecte.id, {
+                mot_de_passe: nouveau,
+                mot_de_passe_actuel: actuel
+            });
+
+            if (res.ok) {
+                afficherMessage('succes-mdp', '✅ Mot de passe modifié avec succès !');
+                document.getElementById('form-mdp').reset();
+            } else {
+                const msg = (res.data && res.data.message) || 'Erreur lors du changement de mot de passe.';
+                afficherMessage('erreur-mdp', '❌ ' + msg);
+            }
         }
     </script>
 

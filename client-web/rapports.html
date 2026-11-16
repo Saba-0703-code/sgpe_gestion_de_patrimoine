@@ -130,37 +130,74 @@
 </head>
 <body>
     <!-- Vérification de connexion -->
+    <script src="js/api.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const connecte = localStorage.getItem('connecte');
-            if (!connecte || connecte !== 'oui') {
-                alert('Veuillez vous connecter d\'abord');
-                window.location.href = 'login.html';
-                return;
-            }
+        let CACHE_BIENS = [];
+        let CACHE_AFFECTATIONS = [];
+        let CACHE_USERS = [];
 
-            // Afficher le nom de l'utilisateur
-            const utilisateur = JSON.parse(localStorage.getItem('utilisateur') || '{}');
-            if (utilisateur.prenom && utilisateur.nom) {
-                document.getElementById('nom-utilisateur').textContent = utilisateur.prenom + ' ' + utilisateur.nom;
-            }
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!requireAuth()) return;
+            afficherUtilisateur();
+            await chargerStats();
         });
 
-        function deconnecter() {
-            localStorage.removeItem('connecte');
-            localStorage.removeItem('utilisateur');
-            window.location.href = 'login.html';
+        async function chargerStats() {
+            const [biens, affectations, users] = await Promise.all([
+                SGPE.get('biens', '/biens', { per_page: 100 }),
+                SGPE.get('gestion', '/affectations', { per_page: 100 }),
+                SGPE.get('admin', '/utilisateurs', { per_page: 100 })
+            ]);
+
+            CACHE_BIENS = (biens.ok && biens.data && biens.data.data) ? biens.data.data : [];
+            CACHE_AFFECTATIONS = (affectations.ok && affectations.data && affectations.data.data) ? affectations.data.data : [];
+            CACHE_USERS = (users.ok && users.data && users.data.data) ? users.data.data : [];
+
+            const cartes = document.querySelectorAll('.carte-stat .valeur');
+            if (cartes.length >= 4) {
+                cartes[0].textContent = CACHE_BIENS.length;
+                cartes[1].textContent = CACHE_AFFECTATIONS.filter(a => a.etat === 'En cours').length;
+                cartes[2].textContent = CACHE_BIENS.length - CACHE_AFFECTATIONS.filter(a => a.etat === 'En cours').length;
+                cartes[3].textContent = CACHE_USERS.filter(u => u.statut === 'Actif').length;
+            }
         }
 
-        function exporter(type) {
-            const messages = {
-                'inventaire': '✅ Génération de l\'inventaire complet en cours...',
-                'affectations': '✅ Génération de l\'état des affectations en cours...',
-                'valeur': '✅ Génération du rapport sur la valeur du patrimoine en cours...',
-                'mouvements': '✅ Génération du rapport des mouvements en cours...'
-            };
-            
-            alert(messages[type] + '\n\n(Téléchargement démarré — fichier de démonstration)');
+        function telechargerCSV(nom, headers, lignes) {
+            const echapperCSV = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+            const csv = '﻿' + [headers, ...lignes].map(r => r.map(echapperCSV).join(';')).join('\r\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = nom + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        async function exporter(type) {
+            await chargerStats();
+
+            if (type === 'inventaire') {
+                telechargerCSV('inventaire',
+                    ['Reference', 'Designation', 'Categorie', 'Etat', 'Valeur', 'Date achat', 'Emplacement'],
+                    CACHE_BIENS.map(b => [b.numero_serie || 'N°' + b.id, b.designation, b.categorie, b.etat, b.valeur, (b.date_achat || '').slice(0, 10), b.emplacement]));
+            } else if (type === 'affectations') {
+                telechargerCSV('affectations',
+                    ['Bien', 'Responsable', 'Service', 'Date affectation', 'Date fin', 'Etat', 'Motif'],
+                    CACHE_AFFECTATIONS.map(a => [a.nom_bien, a.responsable, a.service_destinataire, (a.date_affectation || '').slice(0, 10), (a.date_fin || '').slice(0, 10), a.etat, a.motif]));
+            } else if (type === 'valeur') {
+                const parCategorie = {};
+                CACHE_BIENS.forEach(b => {
+                    const c = b.categorie || 'Autre';
+                    parCategorie[c] = (parCategorie[c] || 0) + (Number(b.valeur) || 0);
+                });
+                const lignes = Object.entries(parCategorie).map(([cat, val]) => [cat, val, CACHE_BIENS.filter(b => (b.categorie || 'Autre') === cat).length]);
+                lignes.push(['TOTAL', CACHE_BIENS.reduce((s, b) => s + (Number(b.valeur) || 0), 0), CACHE_BIENS.length]);
+                telechargerCSV('valeur_patrimoine', ['Categorie', 'Valeur totale (FCFA)', 'Nombre de biens'], lignes);
+            } else if (type === 'mouvements') {
+                telechargerCSV('mouvements',
+                    ['Bien', 'Service destination', 'Responsable', 'Date', 'Etat', 'Motif'],
+                    CACHE_AFFECTATIONS.map(a => [a.nom_bien, a.service_destinataire, a.responsable, (a.date_affectation || '').slice(0, 10), a.etat, a.motif]));
+            }
         }
     </script>
 

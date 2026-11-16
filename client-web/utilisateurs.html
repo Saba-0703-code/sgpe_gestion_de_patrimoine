@@ -91,6 +91,10 @@
         .actions-modal {
             margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;
         }
+        .message {
+            margin-top: 15px; padding: 12px; border-radius: 6px; display: none;
+        }
+        .message.erreur { background: #ffebee; color: #c62828; display: block; }
 
         /* Filtres */
         .filtres {
@@ -119,8 +123,8 @@
         /* Badges */
         .role { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
         .role.admin { background: #e8f5e9; color: #2e7d32; }
+        .role.gestionnaire { background: #fff8e1; color: #f57c00; }
         .role.utilisateur { background: #e3f2fd; color: #1565c0; }
-        .role.lecteur { background: #f3e5f5; color: #7b1fa2; }
 
         .statut { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
         .statut.actif { background: #e8f5e9; color: #2e7d32; }
@@ -144,82 +148,95 @@
     </style>
 </head>
 <body>
-    <!-- Vérification de connexion -->
+    <script src="js/api.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const connecte = localStorage.getItem('connecte');
-            if (!connecte || connecte !== 'oui') {
-                alert('Veuillez vous connecter d\'abord');
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // Afficher le nom de l'utilisateur connecté
-            const utilisateur = JSON.parse(localStorage.getItem('utilisateur') || '{}');
-            if (utilisateur.prenom && utilisateur.nom) {
-                document.getElementById('nom-utilisateur').textContent = utilisateur.prenom + ' ' + utilisateur.nom;
-            }
-
-            chargerUtilisateurs();
-        });
-
-        function deconnecter() {
-            localStorage.removeItem('connecte');
-            localStorage.removeItem('utilisateur');
-            window.location.href = 'login.html';
-        }
-
-        const API_URL = "http://localhost:8000/service-admin/api";
         let tousUtilisateurs = [];
         let utilisateurEnEdition = null;
+        const estAdmin = () => (getUtilisateur() || {}).role === 'admin';
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!requireAuth()) return;
+            afficherUtilisateur();
+            await chargerUtilisateurs();
+
+            if (!estAdmin()) {
+                document.getElementById('zone-admin').style.display = 'none';
+            }
+        });
+
+        function deconnexion() { deconnecter(); }
 
         function initiales(p, n) {
-            return (p.charAt(0) + n.charAt(0)).toUpperCase();
+            return ((p || '?').charAt(0) + (n || '?').charAt(0)).toUpperCase();
+        }
+
+        function libelleRole(role) {
+            return { admin: 'Administrateur', gestionnaire: 'Gestionnaire', utilisateur: 'Utilisateur' }[role] || role;
+        }
+
+        async function chargerUtilisateurs() {
+            const res = await SGPE.get('admin', '/utilisateurs', { per_page: 100 });
+            tousUtilisateurs = (res.ok && res.data && res.data.data) ? res.data.data : [];
+            filtrer();
         }
 
         function ouvrirModal(id = null) {
             utilisateurEnEdition = id;
-            document.getElementById('modal-utilisateur').classList.add('ouvert');
-            
+            const form = document.getElementById('form-utilisateur');
+            form.reset();
+            document.getElementById('message-form').style.display = 'none';
+            document.getElementById('modal-titre').textContent = id ? "Modifier l'utilisateur" : "Ajouter un utilisateur";
+
+            const mdp = document.getElementById('motdepasse');
             if (id) {
                 const u = tousUtilisateurs.find(item => item.id === id);
-                document.getElementById('modal-titre').textContent = "Modifier l'utilisateur";
-                document.getElementById('prenom').value = u.prenom;
-                document.getElementById('nom').value = u.nom;
-                document.getElementById('email').value = u.email;
-                document.getElementById('role').value = u.role;
-                document.getElementById('service').value = u.service;
-                document.getElementById('motdepasse').value = '';
-                document.getElementById('motdepasse').placeholder = 'Laisser vide pour ne pas modifier';
+                if (!u) return;
+                document.getElementById('prenom').value = u.prenom || '';
+                document.getElementById('nom').value = u.nom || '';
+                document.getElementById('email').value = u.email || '';
+                document.getElementById('telephone').value = u.telephone || '';
+                document.getElementById('role').value = u.role || 'utilisateur';
+                document.getElementById('statut').value = u.statut || 'Actif';
+                mdp.value = '';
+                mdp.placeholder = 'Laisser vide pour ne pas modifier';
+                mdp.required = false;
             } else {
-                document.getElementById('modal-titre').textContent = "Ajouter un utilisateur";
-                document.getElementById('form-utilisateur').reset();
-                document.getElementById('motdepasse').placeholder = 'Minimum 8 caractères';
+                document.getElementById('statut').value = 'Actif';
+                mdp.placeholder = 'Minimum 8 caractères';
+                mdp.required = true;
             }
+            document.getElementById('modal-utilisateur').classList.add('ouvert');
         }
 
         function fermerModal() {
             document.getElementById('modal-utilisateur').classList.remove('ouvert');
-            document.getElementById('form-utilisateur').reset();
             utilisateurEnEdition = null;
         }
 
-        function supprimerUtilisateur(id) {
-            if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-                tousUtilisateurs = tousUtilisateurs.filter(u => u.id !== id);
-                afficherUtilisateurs(tousUtilisateurs);
-                alert('✅ Utilisateur supprimé !');
+        async function supprimerUtilisateur(id) {
+            if (!confirm('⚠️ Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) return;
+            const res = await SGPE.del('admin', '/utilisateurs/' + id);
+            if (res.ok) {
+                await chargerUtilisateurs();
+            } else {
+                alert((res.data && res.data.message) || 'Erreur lors de la suppression.');
             }
         }
 
-        async function chargerUtilisateurs() {
-            tousUtilisateurs = [
-                { id: 1, prenom: 'Admin', nom: 'SGPE', email: 'admin@sgpe.tg', role: 'admin', service: 'Direction', statut: 'actif', derniereConnexion: "Aujourd'hui" },
-                { id: 2, prenom: 'Kouassi', nom: 'Yao', email: 'y.kouassi@sgpe.tg', role: 'utilisateur', service: 'Comptabilité', statut: 'actif', derniereConnexion: "Hier" },
-                { id: 3, prenom: 'Koné', nom: 'Aminata', email: 'a.kone@sgpe.tg', role: 'utilisateur', service: 'Ressources Humaines', statut: 'actif', derniereConnexion: "Il y a 3 jours" },
-                { id: 4, prenom: 'Traoré', nom: 'Moussa', email: 'm.traore@sgpe.tg', role: 'lecteur', service: 'Logistique', statut: 'inactif', derniereConnexion: "Il y a 2 mois" }
-            ];
-            afficherUtilisateurs(tousUtilisateurs);
+        function filtrer() {
+            const recherche = document.getElementById('recherche').value.toLowerCase();
+            const role = document.getElementById('filtre-role').value;
+            const statut = document.getElementById('filtre-statut').value;
+
+            const liste = tousUtilisateurs.filter(u =>
+                (!recherche ||
+                    (u.prenom || '').toLowerCase().includes(recherche) ||
+                    (u.nom || '').toLowerCase().includes(recherche) ||
+                    (u.email || '').toLowerCase().includes(recherche))
+                && (!role || u.role === role)
+                && (!statut || u.statut === statut)
+            );
+            afficherUtilisateurs(liste);
         }
 
         function afficherUtilisateurs(liste) {
@@ -228,86 +245,71 @@
                 tbody.innerHTML = '<tr><td colspan="7" class="vide">Aucun utilisateur ne correspond à votre recherche</td></tr>';
                 return;
             }
+            const admin = estAdmin();
             tbody.innerHTML = liste.map(u => `
                 <tr>
                     <td>
                         <div style="display:flex;align-items:center;gap:10px;">
                             <div class="avatar">${initiales(u.prenom, u.nom)}</div>
-                            <div>
-                                <div style="font-weight:500;">${u.prenom} ${u.nom}</div>
-                            </div>
+                            <div style="font-weight:500;">${echapper(u.prenom)} ${echapper(u.nom)}</div>
                         </div>
                     </td>
-                    <td>${u.email}</td>
-                    <td><span class="role ${u.role}">${u.role === 'admin' ? 'Administrateur' : u.role === 'utilisateur' ? 'Utilisateur' : 'Lecteur'}</span></td>
-                    <td>${u.service}</td>
-                    <td><span class="statut ${u.statut}">${u.statut === 'actif' ? 'Actif' : 'Inactif'}</span></td>
-                    <td style="font-size:13px;color:var(--gris-fonce);">${u.derniereConnexion}</td>
-                    <td>
+                    <td>${echapper(u.email)}</td>
+                    <td>${echapper(u.telephone || '—')}</td>
+                    <td><span class="role ${echapper(u.role)}">${libelleRole(u.role)}</span></td>
+                    <td><span class="statut ${u.statut === 'Actif' ? 'actif' : 'inactif'}">${u.statut === 'Actif' ? 'Actif' : 'Inactif'}</span></td>
+                    <td>${admin ? `
                         <button class="btn btn-sm btn-secondaire" onclick="ouvrirModal(${u.id})" title="Modifier">✏️</button>
                         <button class="btn btn-sm btn-danger" onclick="supprimerUtilisateur(${u.id})" title="Supprimer">🗑️</button>
-                    </td>
+                    ` : '—'}</td>
                 </tr>
             `).join('');
         }
 
-        function filtrer() {
-            const recherche = document.getElementById('recherche').value.toLowerCase();
-            const role = document.getElementById('filtre-role').value;
-            const statut = document.getElementById('filtre-statut').value;
-            const filtre = tousUtilisateurs.filter(u => {
-                return (!recherche || 
-                    u.prenom.toLowerCase().includes(recherche) || 
-                    u.nom.toLowerCase().includes(recherche) || 
-                    u.email.toLowerCase().includes(recherche))
-                    && (!role || u.role === role)
-                    && (!statut || u.statut === statut);
-            });
-            afficherUtilisateurs(filtre);
-        }
-
-        document.getElementById('form-utilisateur').addEventListener('submit', function(e) {
+        document.getElementById('form-utilisateur').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            const prenom = document.getElementById('prenom').value.trim();
-            const nom = document.getElementById('nom').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const role = document.getElementById('role').value;
-            const service = document.getElementById('service').value.trim();
+            const msg = document.getElementById('message-form');
+            msg.style.display = 'none';
+
+            const payload = {
+                prenom: document.getElementById('prenom').value.trim(),
+                nom: document.getElementById('nom').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                telephone: document.getElementById('telephone').value.trim() || null,
+                role: document.getElementById('role').value,
+                statut: document.getElementById('statut').value
+            };
             const motdepasse = document.getElementById('motdepasse').value;
+            if (motdepasse) payload.mot_de_passe = motdepasse;
 
-            if (!prenom || !nom || !email || !role) {
-                alert('⚠️ Veuillez remplir tous les champs obligatoires.');
+            if (!payload.prenom || !payload.nom || !payload.email) {
+                msg.textContent = '⚠️ Veuillez remplir tous les champs obligatoires.';
+                msg.className = 'message erreur';
+                return;
+            }
+            if (!utilisateurEnEdition && (!motdepasse || motdepasse.length < 8)) {
+                msg.textContent = '⚠️ Le mot de passe doit contenir au moins 8 caractères.';
+                msg.className = 'message erreur';
                 return;
             }
 
-            if (!utilisateurEnEdition && motdepasse.length < 8) {
-                alert('⚠️ Le mot de passe doit contenir au moins 8 caractères.');
-                return;
-            }
+            const res = utilisateurEnEdition
+                ? await SGPE.put('admin', '/utilisateurs/' + utilisateurEnEdition, payload)
+                : await SGPE.post('admin', '/utilisateurs', payload);
 
-            if (utilisateurEnEdition) {
-                // Mode modification
-                const idx = tousUtilisateurs.findIndex(u => u.id === utilisateurEnEdition);
-                tousUtilisateurs[idx] = {
-                    ...tousUtilisateurs[idx],
-                    prenom, nom, email, role, service
-                };
-                alert('✅ Utilisateur modifié avec succès !');
+            if (res.ok) {
+                fermerModal();
+                await chargerUtilisateurs();
             } else {
-                // Mode ajout
-                const nouvelUtilisateur = {
-                    id: Date.now(),
-                    prenom, nom, email, role, service,
-                    statut: 'actif',
-                    derniereConnexion: "Jamais connecté"
-                };
-                tousUtilisateurs.unshift(nouvelUtilisateur);
-                alert('✅ Utilisateur ajouté avec succès !');
+                let texte = 'Erreur lors de l\'enregistrement.';
+                if (res.data && res.data.errors) {
+                    texte = Object.values(res.data.errors).flat().join(' ');
+                } else if (res.data && res.data.message) {
+                    texte = res.data.message;
+                }
+                msg.textContent = '❌ ' + texte;
+                msg.className = 'message erreur';
             }
-
-            fermerModal();
-            afficherUtilisateurs(tousUtilisateurs);
         });
 
         document.getElementById('recherche').addEventListener('input', filtrer);
@@ -323,4 +325,112 @@
             <a href="inventaire.html">📋 <span>Inventaire</span></a>
             <a href="ajouter-bien.html">➕ <span>Ajouter un bien</span></a>
             <a href="affectations.html">🔄 <span>Affectations</span></a>
-            <a href="utilisateurs.html" class="actif">👥 <
+            <a href="utilisateurs.html" class="actif">👥 <span>Utilisateurs</span></a>
+            <a href="rapports.html">📊 <span>Rapports</span></a>
+            <a href="#" onclick="deconnecter(); return false;">🚪 <span>Déconnexion</span></a>
+        </nav>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="contenu">
+        <div class="entete">
+            <h1>Gestion des Utilisateurs</h1>
+            <div class="utilisateur">
+                <span id="nom-utilisateur">Utilisateur</span>
+                <button class="deconnexion" onclick="deconnecter()">Déconnexion</button>
+            </div>
+        </div>
+
+        <div class="entete" id="zone-admin">
+            <button class="btn btn-primaire" onclick="ouvrirModal()">➕ Nouvel Utilisateur</button>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filtres">
+            <input type="text" id="recherche" placeholder="Rechercher un utilisateur...">
+            <select id="filtre-role">
+                <option value="">Tous les rôles</option>
+                <option value="admin">Administrateur</option>
+                <option value="gestionnaire">Gestionnaire</option>
+                <option value="utilisateur">Utilisateur</option>
+            </select>
+            <select id="filtre-statut">
+                <option value="">Tous les statuts</option>
+                <option value="Actif">Actif</option>
+                <option value="Inactif">Inactif</option>
+            </select>
+        </div>
+
+        <!-- Tableau -->
+        <div class="boite-tableau">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Rôle</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="corps-tableau">
+                    <tr><td colspan="6" class="vide">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal Formulaire -->
+    <div id="modal-utilisateur" class="modal">
+        <div class="modal-content">
+            <button class="fermer" onclick="fermerModal()">&times;</button>
+            <h2 id="modal-titre">Ajouter un utilisateur</h2>
+            <form id="form-utilisateur">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="prenom">Prénom *</label>
+                        <input type="text" id="prenom" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nom">Nom *</label>
+                        <input type="text" id="nom" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telephone">Téléphone</label>
+                        <input type="text" id="telephone">
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Rôle *</label>
+                        <select id="role" required>
+                            <option value="utilisateur">Utilisateur</option>
+                            <option value="gestionnaire">Gestionnaire</option>
+                            <option value="admin">Administrateur</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="statut">Statut</label>
+                        <select id="statut">
+                            <option value="Actif">Actif</option>
+                            <option value="Inactif">Inactif</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="motdepasse">Mot de passe</label>
+                        <input type="password" id="motdepasse" minlength="8" placeholder="Minimum 8 caractères" required>
+                    </div>
+                </div>
+                <div id="message-form" class="message"></div>
+                <div class="actions-modal">
+                    <button type="button" class="btn btn-secondaire" onclick="fermerModal()">Annuler</button>
+                    <button type="submit" class="btn btn-primaire">💾 Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

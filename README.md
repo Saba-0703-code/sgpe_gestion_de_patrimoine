@@ -156,10 +156,13 @@ docker-compose exec service-admin composer install --no-interaction
 
 ### Étape 5 — Exécuter les migrations
 
+> ⚠️ Les schémas `affectations` et `utilisateurs` ont été corrigés : si les bases
+> existent déjà, réinitialisez-les (`migrate:fresh`) avant de migrer.
+
 ```bash
-docker-compose exec service-biens php artisan migrate
-docker-compose exec service-gestion php artisan migrate
-docker-compose exec service-admin php artisan migrate
+docker-compose exec service-biens php artisan migrate:fresh
+docker-compose exec service-gestion php artisan migrate:fresh
+docker-compose exec service-admin php artisan migrate:fresh
 ```
 
 ### Étape 6 — Accéder à l'application
@@ -183,9 +186,9 @@ docker-compose exec service-admin php artisan migrate
 | --- | --- | --- |
 | client-web | **8080** | Interface utilisateur web |
 | api-gateway | **8000** | Passerelle API |
-| service-biens | **9001** | API — Gestion des biens |
-| service-gestion | **9002** | API — Gestion des affectations |
-| service-admin | **9003** | API — Administration |
+| service-biens | **8001** | API — Gestion des biens |
+| service-gestion | **8002** | API — Gestion des affectations |
+| service-admin | **8003** | API — Administration |
 | sgpe-db-biens | **5431** | Base de données (schéma biens) |
 | sgpe-db-gestion | **5432** | Base de données (schéma gestion) |
 | sgpe-db-admin | **5433** | Base de données (schéma admin) |
@@ -220,7 +223,11 @@ Mot de passe : <votre-mot-de-passe>
 
 ## 🔗 API Endpoints
 
-### 📦 Service Biens — `http://localhost:9001/api`
+Toutes les API passent par la passerelle : `http://localhost:8000/api/<service>/...`
+avec `<service>` ∈ `biens`, `gestion`, `admin`. Les routes `/api/biens`, `/api/gestion/*`
+et `/api/admin/*` requièrent un token Bearer (Sanctum) obtenu via `POST /api/admin/login`.
+
+### 📦 Biens — `/api/biens`
 
 | Méthode | Route | Description |
 | --- | --- | --- |
@@ -230,7 +237,7 @@ Mot de passe : <votre-mot-de-passe>
 | PUT/PATCH | `/biens/{id}` | Modifier un bien |
 | DELETE | `/biens/{id}` | Supprimer un bien |
 
-### 🔄 Service Gestion — `http://localhost:9002/api`
+### 🔄 Gestion — `/api/gestion`
 
 | Méthode | Route | Description |
 | --- | --- | --- |
@@ -240,17 +247,18 @@ Mot de passe : <votre-mot-de-passe>
 | PUT/PATCH | `/affectations/{id}` | Modifier une affectation |
 | DELETE | `/affectations/{id}` | Supprimer une affectation |
 
-### 👤 Service Admin — `http://localhost:9003/api`
+### 👤 Admin — `/api/admin`
 
 | Méthode | Route | Description |
 | --- | --- | --- |
-| POST | `/login` | Connexion utilisateur |
+| POST | `/login` | Connexion utilisateur (rate-limité) |
+| GET | `/moi` | Utilisateur connecté |
 | POST | `/logout` | Déconnexion |
 | GET | `/utilisateurs` | Lister les utilisateurs |
-| POST | `/utilisateurs` | Créer un utilisateur |
+| POST | `/utilisateurs` | Créer un utilisateur (admin) |
 | GET | `/utilisateurs/{id}` | Voir un utilisateur |
-| PUT/PATCH | `/utilisateurs/{id}` | Modifier un utilisateur |
-| DELETE | `/utilisateurs/{id}` | Supprimer un utilisateur |
+| PUT/PATCH | `/utilisateurs/{id}` | Modifier (admin ou soi-même) |
+| DELETE | `/utilisateurs/{id}` | Supprimer un utilisateur (admin) |
 
 ---
 
@@ -310,6 +318,7 @@ docker-compose down -v
 - 📄 **Conception UML** → `docs/conception_uml.md`
 - 📄 **Fiche technique** → `docs/fiche_technique.md`
 - 📄 **Guide d'utilisation** → `docs/guide_utilisation.md`
+- 📄 **Déploiement Render** → `docs/deploiement-render.md` + `render.yaml`
 
 ---
 

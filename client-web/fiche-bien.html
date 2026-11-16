@@ -173,16 +173,85 @@
     </style>
 </head>
 <body>
-    <!-- Vérification de connexion -->
+    <script src="js/api.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const connecte = localStorage.getItem('connecte');
-            if (!connecte || connecte !== 'oui') {
-                alert('Veuillez vous connecter d\'abord');
-                window.location.href = 'login.html';
+        let bienActuel = null;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!requireAuth()) return;
+
+            const id = new URLSearchParams(location.search).get('id');
+            if (!id) {
+                window.location.href = 'inventaire.html';
                 return;
             }
+
+            const res = await SGPE.get('biens', '/biens/' + id);
+            if (!res.ok || !res.data) {
+                alert('Bien introuvable.');
+                window.location.href = 'inventaire.html';
+                return;
+            }
+            bienActuel = res.data;
+            remplirFiche(bienActuel);
+            chargerHistorique(bienActuel.id);
         });
+
+        function classeEtat(etat) {
+            if (etat === 'Neuf' || etat === 'Bon') return 'bon';
+            if (etat === 'Moyen') return 'moyen';
+            return 'mauvais';
+        }
+
+        function remplirFiche(b) {
+            document.getElementById('titre-bien').textContent =
+                (b.numero_serie || 'N°' + b.id) + ' — ' + b.designation;
+            document.getElementById('f-ref').textContent = b.numero_serie || 'N°' + b.id;
+            document.getElementById('f-nom').textContent = b.designation;
+            document.getElementById('f-cat').textContent = b.categorie || '—';
+
+            const etatEl = document.getElementById('f-etat');
+            etatEl.textContent = b.etat;
+            etatEl.className = 'etat ' + classeEtat(b.etat);
+
+            document.getElementById('f-valeur').textContent = formaterFCFA(b.valeur);
+            document.getElementById('f-date').textContent = formaterDate(b.date_achat);
+            document.getElementById('f-loc').textContent = b.emplacement || '—';
+            document.getElementById('f-desc').innerHTML = echapper(b.description || 'Aucune description.');
+        }
+
+        async function chargerHistorique(bienId) {
+            const res = await SGPE.get('gestion', '/affectations', { per_page: 100 });
+            const tbody = document.getElementById('corps-historique');
+            const liste = (res.ok && res.data && res.data.data)
+                ? res.data.data.filter(a => Number(a.bien_id) === Number(bienId))
+                : [];
+
+            if (liste.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="vide">Aucun mouvement enregistré</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = liste.map(a => `
+                <tr>
+                    <td>${formaterDate(a.date_affectation)}</td>
+                    <td>🔄 ${echapper(a.etat)}</td>
+                    <td>${echapper(a.responsable)}</td>
+                    <td>${echapper(a.service_destinataire)}${a.motif ? ' — ' + echapper(a.motif) : ''}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function supprimerBien() {
+            if (!bienActuel) return;
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce bien ?')) return;
+            const res = await SGPE.del('biens', '/biens/' + bienActuel.id);
+            if (res.ok) {
+                window.location.href = 'inventaire.html';
+            } else {
+                alert('Erreur lors de la suppression.');
+            }
+        }
     </script>
 
     <!-- Barre latérale -->
@@ -206,7 +275,7 @@
             <h1 id="titre-bien">EQ-024 — Ordinateur portable</h1>
             <div>
                 <a href="ajouter-bien.html" class="btn btn-secondaire">✏️ Modifier</a>
-                <button class="btn btn-danger" onclick="alert('🗑️ Fonction de suppression en mode démo')">🗑️ Supprimer</button>
+                <button class="btn btn-danger" onclick="supprimerBien()">🗑️ Supprimer</button>
             </div>
         </div>
 
@@ -258,15 +327,7 @@
                 <!-- Onglet Description -->
                 <div id="description" class="onglet-contenu actif">
                     <h2>Description</h2>
-                    <p id="f-desc">
-                        Ordinateur portable de marque Dell, modèle Latitude 5420.<br><br>
-                        <strong>Caractéristiques :</strong><br>
-                        • Processeur : Intel Core i5<br>
-                        • Mémoire RAM : 16 Go<br>
-                        • Stockage : 512 Go SSD<br>
-                        • Système d'exploitation : Windows 11 Pro<br><br>
-                        Acheté neuf en mars 2025 pour les besoins du service financier.
-                    </p>
+                    <p id="f-desc">Chargement...</p>
                 </div>
 
                 <!-- Onglet Historique -->
@@ -282,24 +343,7 @@
                             </tr>
                         </thead>
                         <tbody id="corps-historique">
-                            <tr>
-                                <td>15/03/2025</td>
-                                <td>✅ Enregistrement</td>
-                                <td>Admin SGPE</td>
-                                <td>Bien acquis neuf</td>
-                            </tr>
-                            <tr>
-                                <td>20/04/2025</td>
-                                <td>🔄 Affectation</td>
-                                <td>Admin SGPE</td>
-                                <td>Affecté à M. Kouassi — Bureau A10</td>
-                            </tr>
-                            <tr>
-                                <td>10/01/2026</td>
-                                <td>🔄 Réaffectation</td>
-                                <td>Admin SGPE</td>
-                                <td>Transféré au service comptabilité</td>
-                            </tr>
+                            <tr><td colspan="4" class="vide">Chargement...</td></tr>
                         </tbody>
                     </table>
                 </div>
