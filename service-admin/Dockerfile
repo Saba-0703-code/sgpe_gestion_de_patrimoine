@@ -49,8 +49,9 @@ RUN if [ ! -d "vendor" ]; then \
     fi
 
 # Permissions
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache && \
-    chown -R www-data:www-data /var/www/html
+RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache && \
+    chmod -R 775 storage bootstrap/cache && \
+    chown -R www-data:www-data storage bootstrap/cache
 
 # VÃ©rification de la santÃ© du conteneur
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
