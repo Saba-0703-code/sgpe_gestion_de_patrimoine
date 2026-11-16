@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('mot_de_passe');
             $table->string('telephone')->nullable();
             $table->string('role');
-            $table->boolean('est_actif')->default(true);
+            $table->string('statut')->default('Actif');
             $table->rememberToken();
             $table->timestamps();
         });

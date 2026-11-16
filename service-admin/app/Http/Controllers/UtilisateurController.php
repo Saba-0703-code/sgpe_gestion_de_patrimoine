@@ -46,7 +46,7 @@ class UtilisateurController extends Controller
                 'nom' => 'required|string|max:255',
                 'prenom' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:utilisateurs',
-                'mot_de_passe' => 'required|string|min:6',
+                'mot_de_passe' => 'required|string|min:8',
                 'telephone' => 'nullable|string|max:20',
                 'role' => 'required|in:admin,gestionnaire,utilisateur',
                 'statut' => 'required|in:Actif,Inactif',
@@ -110,6 +110,17 @@ class UtilisateurController extends Controller
         }
     }
 
+    public function me(Request $request)
+    {
+        return response()->json($request->user(), 200);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['message' => 'Déconnexion réussie'], 200);
+    }
+
     public function show(string $id)
     {
         try {
@@ -124,16 +135,34 @@ class UtilisateurController extends Controller
     {
         try {
             $utilisateur = Utilisateur::findOrFail($id);
-            
+
+            // Admin : tout modifier — Utilisateur : uniquement son propre profil
+            $auteur = $request->user();
+            if ($auteur->role !== 'admin' && $auteur->id !== $utilisateur->id) {
+                return response()->json(['message' => 'Accès refusé'], 403);
+            }
+
             $validated = $request->validate([
                 'nom' => 'sometimes|required|string|max:255',
                 'prenom' => 'sometimes|required|string|max:255',
                 'email' => 'sometimes|required|string|email|max:255|unique:utilisateurs,email,'.$id,
-                'mot_de_passe' => 'nullable|string|min:6',
+                'mot_de_passe' => 'nullable|string|min:8',
                 'telephone' => 'nullable|string|max:20',
                 'role' => 'sometimes|required|in:admin,gestionnaire,utilisateur',
                 'statut' => 'sometimes|required|in:Actif,Inactif',
             ]);
+
+            // Changement de mot de passe par l'utilisateur lui-même : vérifier l'ancien
+            if (!empty($validated['mot_de_passe'])
+                && $auteur->role !== 'admin'
+                && $auteur->id === $utilisateur->id
+                && (empty($request->mot_de_passe_actuel)
+                    || !Hash::check($request->mot_de_passe_actuel, $utilisateur->mot_de_passe))) {
+                return response()->json([
+                    'message' => 'Mot de passe actuel incorrect',
+                    'errors' => ['mot_de_passe_actuel' => ['Le mot de passe actuel est incorrect']]
+                ], 422);
+            }
 
             if (!empty($validated['mot_de_passe'])) {
                 $validated['mot_de_passe'] = Hash::make($validated['mot_de_passe']);
