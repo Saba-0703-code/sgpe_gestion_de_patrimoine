@@ -12,7 +12,8 @@
 
 databases:
   - name: sgpe-db
-    engine: postgres
+    databaseName: sgpe_db
+    user: sgpe_user
     plan: free
 
 services:
