@@ -7,8 +7,8 @@
 #   - 1 base PostgreSQL gratuite avec 3 schémas : biens, gestion, admin
 #
 # ⚠️ Avant le premier déploiement :
-#   1. Créer les schémas dans la base Render (section "Manual setup" du README).
-#   2. Définir ADMIN_EMAIL / ADMIN_PASSWORD sur sgpe-admin puis lancer le seeder.
+#   1. Créer les schémas dans la base Render (docs/deploiement-render.md).
+#   2. Définir ADMIN_PASSWORD à la création du Blueprint puis lancer le seeder.
 
 databases:
   - name: sgpe-db
