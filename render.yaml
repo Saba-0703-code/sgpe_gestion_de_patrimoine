@@ -1,0 +1,169 @@
+# Blueprint Render — SGPE (offre gratuite)
+# Déploiement : Render Dashboard > New > Blueprint > connecter ce repo.
+#
+# Architecture :
+#   - 3 services web Docker (Laravel + nginx/php-fpm dans le même conteneur)
+#   - 1 site statique (client-web)
+#   - 1 base PostgreSQL gratuite avec 3 schémas : biens, gestion, admin
+#
+# ⚠️ Avant le premier déploiement :
+#   1. Créer les schémas dans la base Render (section "Manual setup" du README).
+#   2. Définir ADMIN_EMAIL / ADMIN_PASSWORD sur sgpe-admin puis lancer le seeder.
+
+databases:
+  - name: sgpe-db
+    engine: postgres
+    plan: free
+
+services:
+  - type: web
+    name: sgpe-biens
+    runtime: docker
+    dockerfilePath: ./service-biens/Dockerfile
+    dockerContext: ./service-biens
+    plan: free
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: sgpe-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: sgpe-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: sgpe-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: sgpe-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: sgpe-db
+          property: password
+      - key: DB_SCHEMA
+        value: biens
+      - key: APP_URL_ADMIN
+        value: https://sgpe-admin.onrender.com
+      - key: CACHE_STORE
+        value: file
+      - key: SESSION_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://sgpe-web.onrender.com
+
+  - type: web
+    name: sgpe-gestion
+    runtime: docker
+    dockerfilePath: ./service-gestion/Dockerfile
+    dockerContext: ./service-gestion
+    plan: free
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: sgpe-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: sgpe-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: sgpe-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: sgpe-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: sgpe-db
+          property: password
+      - key: DB_SCHEMA
+        value: gestion
+      - key: APP_URL_ADMIN
+        value: https://sgpe-admin.onrender.com
+      - key: CACHE_STORE
+        value: file
+      - key: SESSION_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://sgpe-web.onrender.com
+
+  - type: web
+    name: sgpe-admin
+    runtime: docker
+    dockerfilePath: ./service-admin/Dockerfile
+    dockerContext: ./service-admin
+    plan: free
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: sgpe-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: sgpe-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: sgpe-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: sgpe-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: sgpe-db
+          property: password
+      - key: DB_SCHEMA
+        value: admin
+      - key: ADMIN_EMAIL
+        value: admin@sgpe.tg
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CACHE_STORE
+        value: file
+      - key: SESSION_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://sgpe-web.onrender.com
+
+  - type: web
+    name: sgpe-web
+    runtime: static
+    staticPublishPath: ./client-web
+    buildCommand: "echo static"
