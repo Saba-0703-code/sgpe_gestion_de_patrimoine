@@ -7,6 +7,8 @@ LABEL description="Microservice SGPE — PHP 8.4 / Laravel 12"
 
 # Mise à jour des paquets et installation des dépendances système
 RUN apk update && apk add --no-cache \
+    nginx \
+    curl \
     postgresql-dev \
     curl-dev \
     libzip-dev \
@@ -35,6 +37,11 @@ WORKDIR /var/www/html
 # Copie des fichiers de l'application
 COPY . .
 
+# Serveur web nginx + PHP-FPM
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
 # Installation des dépendances Composer (si vendor est absent)
 RUN if [ ! -d "vendor" ]; then \
         curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer; \
@@ -46,11 +53,11 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache && \
     chown -R www-data:www-data /var/www/html
 
 # Vérification de la santé du conteneur
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost/ping || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD curl -f http://localhost/up || exit 1
 
-# Exposition du port FPM
-EXPOSE 9000
+# Ports exposés : HTTP (nginx) et FPM
+EXPOSE 80 9000
 
-# Démarrage de PHP-FPM (commande par défaut de l'image, ne pas la surcharger)
-CMD ["php-fpm"]
+# Démarrage : PHP-FPM + nginx
+CMD ["sh", "/usr/local/bin/start.sh"]

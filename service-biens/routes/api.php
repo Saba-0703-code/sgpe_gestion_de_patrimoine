@@ -1,6 +1,6 @@
 <?php
 
+use App\Http\Controllers\BienController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\BienController;
 
-Route::apiResource('biens', BienController::class);
+Route::middleware('verify.token')->apiResource('biens', BienController::class);
