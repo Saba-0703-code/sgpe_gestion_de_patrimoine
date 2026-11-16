@@ -242,57 +242,61 @@
                 <button type="submit" id="submitBtn" class="btn-connexion">Se connecter</button>
             </form>
 
-            <div class="info-demo">
+            <div class="info-demo" id="info-demo" style="display:none">
                 <strong>Identifiants de démonstration :</strong><br>
                 Email : admin@gouv.tg<br>
-                Mot de passe : admin123
+                Mot de passe : voir l'administrateur
             </div>
         </div>
     </div>
 
+    <script src="js/api.js"></script>
     <script>
+        // Déjà connecté -> tableau de bord
+        if (estConnecte()) {
+            window.location.href = 'dashboard.html';
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('loginForm');
             const alertDiv = document.getElementById('alert');
             const submitBtn = document.getElementById('submitBtn');
-            
-            form.addEventListener('submit', function(e) {
+
+            form.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                
-                // Cacher l'alerte précédente
+
                 alertDiv.style.display = 'none';
                 alertDiv.className = 'alert';
-                
+
                 const email = document.getElementById('email').value.trim();
                 const motDePasse = document.getElementById('password').value;
-                
-                // Vérification des champs
+
                 if (!email || !motDePasse) {
                     alertDiv.textContent = 'Veuillez remplir tous les champs.';
                     alertDiv.classList.add('error');
                     return;
                 }
-                
-                // Identifiants de démo
-                if (email === 'admin@gouv.tg' && motDePasse === 'admin123') {
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = 'Connexion en cours...';
-                    
-                    // Enregistrer la session
-                    localStorage.setItem('utilisateur', JSON.stringify({
-                        nom: 'Admin',
-                        prenom: 'SGPE',
-                        email: email,
-                        role: 'admin'
-                    }));
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Connexion en cours...';
+
+                const res = await SGPE.post('admin', '/login', {
+                    email: email,
+                    mot_de_passe: motDePasse
+                });
+
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Se connecter';
+
+                if (res.ok && res.data && res.data.token) {
+                    SGPE.setToken(res.data.token);
+                    localStorage.setItem('utilisateur', JSON.stringify(res.data.utilisateur));
                     localStorage.setItem('connecte', 'oui');
-                    
-                    // Redirection après une courte pause
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 600);
+                    window.location.href = 'dashboard.html';
                 } else {
-                    alertDiv.textContent = '❌ Identifiants incorrects. Veuillez vérifier votre email et votre mot de passe.';
+                    const msg = (res.data && (res.data.message || (res.data.errors && Object.values(res.data.errors).flat()[0])))
+                        || 'Identifiants incorrects.';
+                    alertDiv.textContent = '❌ ' + msg;
                     alertDiv.classList.add('error');
                 }
             });

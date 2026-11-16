@@ -55,7 +55,7 @@
                 <h1>Inventaire des Biens</h1>
                 <p>Liste complète du patrimoine de l'État</p>
             </div>
-            <button class="btn btn-primary" onclick="alert('Formulaire d\\'ajout — Fonctionnel en mode démo !')">+ Ajouter un bien</button>
+            <button class="btn btn-primary" onclick="window.location.href='ajouter-bien.html'">+ Ajouter un bien</button>
         </div>
 
         <div class="card">
@@ -76,42 +76,37 @@
         </div>
     </main>
 
-    <script src="js/demo-data.js"></script>
+    <script src="js/api.js"></script>
     <script>
-        // Vérifier la connexion
-        if (!localStorage.getItem('connecte')) {
-            window.location.href = 'login.html';
-        }
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!requireAuth()) return;
+            afficherUtilisateur();
 
-        // Charger et afficher les données
-        document.addEventListener('DOMContentLoaded', function() {
-            const biens = JSON.parse(localStorage.getItem('biens')) || [];
+            const res = await SGPE.get('biens', '/biens', { per_page: 100 });
+            const biens = (res.ok && res.data && res.data.data) ? res.data.data : [];
             const tbody = document.getElementById('table-body');
-            
-            tbody.innerHTML = '';
-            biens.forEach(bien => {
+
+            if (biens.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">Aucun bien enregistré</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = biens.map(bien => {
                 let badgeClass = 'badge-success';
                 if (bien.etat === 'Moyen') badgeClass = 'badge-warning';
-                if (bien.etat === 'Dégradé') badgeClass = 'badge-info';
-                
-                tbody.innerHTML += `
+                if (bien.etat === 'Dégradé' || bien.etat === 'Hors service') badgeClass = 'badge-info';
+
+                return `
                     <tr>
-                        <td><strong>${bien.designation}</strong></td>
-                        <td>${bien.categorie}</td>
-                        <td><span class="badge ${badgeClass}">${bien.etat}</span></td>
-                        <td>${bien.localisation}</td>
-                        <td>${bien.valeur}</td>
+                        <td><strong>${echapper(bien.designation)}</strong></td>
+                        <td>${echapper(bien.categorie)}</td>
+                        <td><span class="badge ${badgeClass}">${echapper(bien.etat)}</span></td>
+                        <td>${echapper(bien.emplacement || '—')}</td>
+                        <td>${formaterFCFA(bien.valeur)}</td>
                     </tr>
                 `;
-            });
+            }).join('');
         });
-
-        // Déconnexion
-        function deconnecter() {
-            localStorage.removeItem('connecte');
-            localStorage.removeItem('utilisateur');
-            window.location.href = 'login.html';
-        }
     </script>
 </body>
 </html>

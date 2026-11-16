@@ -6,185 +6,198 @@
     <title>SGPE — Gestion des Affectations</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        :root { 
-            --primaire: #00a896; 
-            --foncee: #008080; 
-            --claire: #e6f7f5; 
-            --texte: #334443; 
-            --gris: #f4f6f6; 
-            --gris-fonce: #888; 
+        :root {
+            --primaire: #00a896;
+            --foncee: #008080;
+            --claire: #e6f7f5;
+            --texte: #334443;
+            --gris: #f4f6f6;
+            --gris-fonce: #888;
         }
         body { display: flex; min-height: 100vh; background: var(--gris); }
-        
+
         /* Barre latérale */
-        .sidebar { 
-            width: 260px; 
-            background: white; 
-            border-right: 1px solid #e0e0e0; 
-            padding: 20px 0; 
-            position: fixed; 
-            height: 100vh; 
+        .sidebar {
+            width: 260px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
         }
-        .sidebar .logo { 
-            padding: 20px 25px; 
-            font-size: 22px; 
-            font-weight: bold; 
-            color: var(--foncee); 
-            border-bottom: 1px solid #eee; 
-            margin-bottom: 15px; 
+        .sidebar .logo {
+            padding: 20px 25px;
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--foncee);
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
         }
-        .sidebar nav a { 
-            display: flex; 
-            align-items: center; 
-            padding: 14px 25px; 
-            color: var(--texte); 
-            text-decoration: none; 
+        .sidebar nav a {
+            display: flex;
+            align-items: center;
+            padding: 14px 25px;
+            color: var(--texte);
+            text-decoration: none;
         }
-        .sidebar nav a.actif { 
-            background: var(--claire); 
-            color: var(--primaire); 
-            border-left: 4px solid var(--primaire); 
+        .sidebar nav a.actif {
+            background: var(--claire);
+            color: var(--primaire);
+            border-left: 4px solid var(--primaire);
         }
         .sidebar nav a:hover:not(.actif) { background: #f0f0f0; }
         .sidebar nav a span { margin-left: 10px; }
 
         /* Contenu principal */
         .contenu { flex: 1; margin-left: 260px; padding: 25px; }
-        .entete { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 25px; 
-            flex-wrap: wrap; 
-            gap: 15px; 
+        .entete {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
         .entete h1 { font-size: 26px; color: var(--texte); }
-        .btn { 
-            padding: 10px 18px; 
-            border-radius: 6px; 
-            border: none; 
-            cursor: pointer; 
-            font-weight: 500; 
-            text-decoration: none; 
-            display: inline-block; 
+        .btn {
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
         }
         .btn-primaire { background: var(--primaire); color: white; }
         .btn-primaire:hover { background: #009484; }
         .btn-secondaire { background: #e0e0e0; color: var(--texte); }
         .btn-sm { padding: 6px 12px; font-size: 13px; }
+        .btn-danger { background: #e53935; color: white; }
         .utilisateur { display: flex; align-items: center; gap: 10px; }
-        .deconnexion { 
-            padding: 8px 16px; 
-            background: #e53935; 
-            color: white; 
-            border: none; 
-            border-radius: 6px; 
-            cursor: pointer; 
+        .deconnexion {
+            padding: 8px 16px;
+            background: #e53935;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
         }
 
         /* Filtres */
-        .filtres { 
-            background: white; 
-            padding: 18px; 
-            border-radius: 8px; 
-            margin-bottom: 20px; 
-            display: flex; 
-            gap: 12px; 
-            flex-wrap: wrap; 
+        .filtres {
+            background: white;
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
         }
-        .filtres input, .filtres select { 
-            padding: 9px 12px; 
-            border: 1px solid #ddd; 
-            border-radius: 6px; 
-            font-size: 14px; 
-            min-width: 160px; 
+        .filtres input, .filtres select {
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 160px;
+        }
+        .filtres input:focus, .filtres select:focus {
+            outline: none;
+            border-color: var(--primaire);
         }
 
         /* Tableau */
-        .boite-tableau { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            overflow-x: auto; 
+        .boite-tableau {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
         }
         table { width: 100%; border-collapse: collapse; }
-        table th, table td { 
-            padding: 12px 10px; 
-            text-align: left; 
-            border-bottom: 1px solid #eee; 
-            font-size: 14px; 
+        table th, table td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
         }
         table th { background: #fafafa; color: #666; font-weight: 600; }
-        .statut { 
-            padding: 4px 10px; 
-            border-radius: 12px; 
-            font-size: 12px; 
-            font-weight: 500; 
+        .statut {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
         }
         .statut.en-cours { background: #e8f5e9; color: #2e7d32; }
-        .statut.retourne { background: #e3f2fd; color: #1565c0; }
-        .statut.perdu { background: #ffebee; color: #c62828; }
+        .statut.terminee { background: #e3f2fd; color: #1565c0; }
+        .statut.annulee { background: #ffebee; color: #c62828; }
         .vide { text-align: center; padding: 40px; color: var(--gris-fonce); }
 
         /* Modal */
-        .modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.5); 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 1000; 
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         }
         .modal.ouvert { display: flex; }
-        .modal-content { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 10px; 
-            max-width: 550px; 
-            width: 90%; 
-            max-height: 90vh; 
-            overflow-y: auto; 
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .modal-content h2 { font-size: 20px; margin-bottom: 20px; color: var(--texte); }
-        .fermer { 
-            float: right; 
-            background: none; 
-            border: none; 
-            font-size: 22px; 
-            cursor: pointer; 
-            color: #999; 
+        .fermer {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: #999;
         }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .form-group { margin-bottom: 15px; }
         .form-group.full-width { grid-column: 1 / -1; }
-        .form-group label { 
-            display: block; 
-            margin-bottom: 6px; 
-            color: var(--texte); 
-            font-weight: 500; 
-            font-size: 14px; 
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--texte);
+            font-weight: 500;
+            font-size: 14px;
         }
-        .form-group input, .form-group select, .form-group textarea { 
-            width: 100%; 
-            padding: 10px 12px; 
-            border: 1px solid #ddd; 
-            border-radius: 6px; 
-            font-size: 14px; 
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
         }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { 
-            outline: none; 
-            border-color: var(--primaire); 
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primaire);
         }
-        .actions-modal { 
-            margin-top: 20px; 
-            display: flex; 
-            gap: 10px; 
-            justify-content: flex-end; 
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .actions-modal {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
         }
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            display: none;
+        }
+        .message.erreur { background: #ffebee; color: #c62828; display: block; }
 
         /* Responsive */
         @media(max-width: 900px) {
@@ -197,25 +210,168 @@
     </style>
 </head>
 <body>
-    <!-- Vérification de connexion -->
+    <script src="js/api.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const connecte = localStorage.getItem('connecte');
-            if (!connecte || connecte !== 'oui') {
-                alert('Veuillez vous connecter d\'abord');
-                window.location.href = 'login.html';
+        let toutesAffectations = [];
+        let biensDisponibles = [];
+        let affectationEnEdition = null;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!requireAuth()) return;
+            afficherUtilisateur();
+            await chargerBiens();
+            await chargerAffectations();
+        });
+
+        // Charger les biens pour le select du formulaire
+        async function chargerBiens() {
+            const res = await SGPE.get('biens', '/biens', { per_page: 100 });
+            biensDisponibles = (res.ok && res.data && res.data.data) ? res.data.data : [];
+
+            const select = document.getElementById('bien');
+            select.innerHTML = '<option value="">Choisir un bien</option>';
+            biensDisponibles.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.id;
+                opt.textContent = (b.numero_serie ? b.numero_serie + ' — ' : '') + b.designation;
+                opt.dataset.nom = b.designation;
+                select.appendChild(opt);
+            });
+        }
+
+        async function chargerAffectations() {
+            const res = await SGPE.get('gestion', '/affectations', { per_page: 100 });
+            toutesAffectations = (res.ok && res.data && res.data.data) ? res.data.data : [];
+            filtrer();
+        }
+
+        function classeEtat(etat) {
+            if (etat === 'En cours') return 'en-cours';
+            if (etat === 'Terminée') return 'terminee';
+            return 'annulee';
+        }
+
+        function filtrer() {
+            const recherche = document.getElementById('recherche').value.toLowerCase();
+            const etat = document.getElementById('filtre-etat').value;
+
+            const resultat = toutesAffectations.filter(a => {
+                const correspondRecherche = !recherche ||
+                    (a.nom_bien && a.nom_bien.toLowerCase().includes(recherche)) ||
+                    (a.responsable && a.responsable.toLowerCase().includes(recherche)) ||
+                    (a.service_destinataire && a.service_destinataire.toLowerCase().includes(recherche));
+                const correspondEtat = !etat || a.etat === etat;
+                return correspondRecherche && correspondEtat;
+            });
+
+            afficherAffectations(resultat);
+        }
+
+        function afficherAffectations(liste) {
+            const tbody = document.getElementById('corps-tableau');
+            if (liste.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="vide">Aucune affectation ne correspond à votre recherche</td></tr>';
                 return;
             }
+            tbody.innerHTML = liste.map(a => `
+                <tr>
+                    <td><strong>N°${a.bien_id || '—'}</strong></td>
+                    <td>${echapper(a.nom_bien)}</td>
+                    <td>${echapper(a.responsable)}</td>
+                    <td>${echapper(a.service_destinataire)}</td>
+                    <td>${formaterDate(a.date_affectation)}</td>
+                    <td><span class="statut ${classeEtat(a.etat)}">${echapper(a.etat)}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-secondaire" onclick="ouvrirModal(${a.id})" title="Modifier">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="supprimerAffectation(${a.id})" title="Supprimer">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
 
-            // Afficher le nom de l'utilisateur
-            const utilisateur = JSON.parse(localStorage.getItem('utilisateur') || '{}');
-            if (utilisateur.prenom && utilisateur.nom) {
-                document.getElementById('nom-utilisateur').textContent = utilisateur.prenom + ' ' + utilisateur.nom;
+        function ouvrirModal(id = null) {
+            affectationEnEdition = id;
+            const form = document.getElementById('form-affectation');
+            form.reset();
+            document.getElementById('message-form').style.display = 'none';
+            document.getElementById('modal-titre').textContent = id ? 'Modifier l\'affectation' : 'Nouvelle Affectation';
+
+            if (id) {
+                const a = toutesAffectations.find(x => x.id === id);
+                if (!a) return;
+                document.getElementById('bien').value = a.bien_id || '';
+                document.getElementById('nom-bien').value = a.nom_bien || '';
+                document.getElementById('responsable').value = a.responsable || '';
+                document.getElementById('service').value = a.service_destinataire || '';
+                document.getElementById('date-affect').value = (a.date_affectation || '').slice(0, 10);
+                document.getElementById('date-fin').value = (a.date_fin || '').slice(0, 10);
+                document.getElementById('etat').value = a.etat || 'En cours';
+                document.getElementById('motif').value = a.motif || '';
+            } else {
+                document.getElementById('nom-bien').value = '';
+                document.getElementById('etat').value = 'En cours';
             }
+            document.getElementById('modal-affectation').classList.add('ouvert');
+        }
 
-            // Charger les données
-            chargerAffectations();
+        function fermerModal() {
+            document.getElementById('modal-affectation').classList.remove('ouvert');
+            affectationEnEdition = null;
+        }
+
+        async function supprimerAffectation(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer cette affectation ?')) return;
+            const res = await SGPE.del('gestion', '/affectations/' + id);
+            if (res.ok) {
+                await chargerAffectations();
+            } else {
+                alert('Erreur lors de la suppression.');
+            }
+        }
+
+        // Remplit automatiquement le nom du bien quand on choisit dans la liste
+        document.getElementById('bien').addEventListener('change', function() {
+            const opt = this.options[this.selectedIndex];
+            document.getElementById('nom-bien').value = opt && opt.dataset.nom ? opt.dataset.nom : '';
         });
+
+        document.getElementById('form-affectation').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const msg = document.getElementById('message-form');
+            msg.style.display = 'none';
+
+            const payload = {
+                bien_id: Number(document.getElementById('bien').value) || null,
+                nom_bien: document.getElementById('nom-bien').value.trim(),
+                responsable: document.getElementById('responsable').value.trim(),
+                service_destinataire: document.getElementById('service').value.trim(),
+                date_affectation: document.getElementById('date-affect').value,
+                date_fin: document.getElementById('date-fin').value || null,
+                etat: document.getElementById('etat').value,
+                motif: document.getElementById('motif').value.trim() || null
+            };
+
+            const res = affectationEnEdition
+                ? await SGPE.put('gestion', '/affectations/' + affectationEnEdition, payload)
+                : await SGPE.post('gestion', '/affectations', payload);
+
+            if (res.ok) {
+                fermerModal();
+                await chargerAffectations();
+            } else {
+                let texte = 'Erreur lors de l\'enregistrement.';
+                if (res.data && res.data.errors) {
+                    texte = Object.values(res.data.errors).flat().join(' ');
+                } else if (res.data && res.data.message) {
+                    texte = res.data.message;
+                }
+                msg.textContent = '❌ ' + texte;
+                msg.className = 'message erreur';
+            }
+        });
+
+        document.getElementById('recherche').addEventListener('input', filtrer);
+        document.getElementById('filtre-etat').addEventListener('change', filtrer);
     </script>
 
     <!-- Barre latérale -->
@@ -228,6 +384,7 @@
             <a href="affectations.html" class="actif">🔄 <span>Affectations</span></a>
             <a href="utilisateurs.html">👥 <span>Utilisateurs</span></a>
             <a href="rapports.html">📊 <span>Rapports</span></a>
+            <a href="#" onclick="deconnecter(); return false;">🚪 <span>Déconnexion</span></a>
         </nav>
     </aside>
 
@@ -248,11 +405,11 @@
         <!-- Filtres -->
         <div class="filtres">
             <input type="text" id="recherche" placeholder="Rechercher...">
-            <select id="filtre-statut">
-                <option value="">Tous les statuts</option>
-                <option value="en-cours">En cours</option>
-                <option value="retourne">Retourné</option>
-                <option value="perdu">Perdu</option>
+            <select id="filtre-etat">
+                <option value="">Tous les états</option>
+                <option value="En cours">En cours</option>
+                <option value="Terminée">Terminée</option>
+                <option value="Annulée">Annulée</option>
             </select>
         </div>
 
@@ -281,22 +438,22 @@
     <div id="modal-affectation" class="modal">
         <div class="modal-content">
             <button class="fermer" onclick="fermerModal()">&times;</button>
-            <h2>Nouvelle Affectation</h2>
+            <h2 id="modal-titre">Nouvelle Affectation</h2>
             <form id="form-affectation">
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="bien">Bien concerné *</label>
                         <select id="bien" required>
                             <option value="">Choisir un bien</option>
-                            <option>EQ-024 — Ordinateur portable</option>
-                            <option>MB-018 — Table de réunion</option>
-                            <option>VE-007 — Véhicule de service</option>
-                            <option>IM-003 — Imprimante salle B</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="nom-resp">Nom du responsable *</label>
-                        <input type="text" id="nom-resp" placeholder="M. / Mme X" required>
+                        <label for="nom-bien">Nom du bien *</label>
+                        <input type="text" id="nom-bien" placeholder="Désignation du bien" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="responsable">Responsable *</label>
+                        <input type="text" id="responsable" placeholder="M. / Mme X" required>
                     </div>
                     <div class="form-group">
                         <label for="service">Service / Département *</label>
@@ -307,15 +464,15 @@
                         <input type="date" id="date-affect" required>
                     </div>
                     <div class="form-group">
-                        <label for="date-retour">Date de retour prévue</label>
-                        <input type="date" id="date-retour">
+                        <label for="date-fin">Date de fin</label>
+                        <input type="date" id="date-fin">
                     </div>
                     <div class="form-group">
-                        <label for="statut">Statut</label>
-                        <select id="statut">
-                            <option value="en-cours" selected>En cours</option>
-                            <option value="retourne">Retourné</option>
-                            <option value="perdu">Perdu</option>
+                        <label for="etat">État</label>
+                        <select id="etat">
+                            <option value="En cours" selected>En cours</option>
+                            <option value="Terminée">Terminée</option>
+                            <option value="Annulée">Annulée</option>
                         </select>
                     </div>
                     <div class="form-group full-width">
@@ -323,6 +480,7 @@
                         <textarea id="motif" placeholder="Pourquoi cette affectation..."></textarea>
                     </div>
                 </div>
+                <div id="message-form" class="message"></div>
                 <div class="actions-modal">
                     <button type="button" class="btn btn-secondaire" onclick="fermerModal()">Annuler</button>
                     <button type="submit" class="btn btn-primaire">💾 Enregistrer</button>
@@ -330,59 +488,5 @@
             </form>
         </div>
     </div>
-
-    <script src="js/demo-data.js"></script>
-    <script>
-        let toutesAffectations = [];
-
-        // Données de démonstration
-        const DEMO_AFFECTATIONS = [
-            { ref: 'EQ-024', bien: 'Ordinateur portable HP', resp: 'M. Amara KOUASSI', service: 'Service Informatique', dateAff: '2026-11-01', statut: 'en-cours' },
-            { ref: 'MB-018', bien: 'Table de réunion', resp: 'Mme Afi MENSAH', service: 'Salle de réunion', dateAff: '2026-10-15', statut: 'retourne' },
-            { ref: 'VE-007', bien: 'Véhicule de service TOYOTA', resp: 'M. Jean KOMLAN', service: 'Service Logistique', dateAff: '2026-11-10', statut: 'en-cours' },
-            { ref: 'IM-003', bien: 'Imprimante salle B', resp: 'Mme Lili AFI', service: 'Service Comptabilité', dateAff: '2026-09-05', statut: 'perdu' },
-        ];
-
-        function chargerAffectations() {
-            // Charger depuis localStorage ou utiliser les données de démo
-            const stockees = localStorage.getItem('affectations');
-            toutesAffectations = stockees ? JSON.parse(stockees) : DEMO_AFFECTATIONS;
-            afficherAffectations(toutesAffectations);
-        }
-
-        function sauvegarderAffectations() {
-            localStorage.setItem('affectations', JSON.stringify(toutesAffectations));
-        }
-
-        function deconnecter() {
-            localStorage.removeItem('connecte');
-            localStorage.removeItem('utilisateur');
-            window.location.href = 'login.html';
-        }
-
-        function ouvrirModal() {
-            document.getElementById('modal-affectation').classList.add('ouvert');
-        }
-
-        function fermerModal() {
-            document.getElementById('modal-affectation').classList.remove('ouvert');
-            document.getElementById('form-affectation').reset();
-        }
-
-        function afficherAffectations(liste) {
-            const tbody = document.getElementById('corps-tableau');
-            if (liste.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="vide">Aucune affectation ne correspond à votre recherche</td></tr>';
-                return;
-            }
-            tbody.innerHTML = liste.map(a => `
-                <tr>
-                    <td><strong>${a.ref}</strong></td>
-                    <td>${a.bien}</td>
-                    <td>${a.resp}</td>
-                    <td>${a.service}</td>
-                    <td>${a.dateAff}</td>
-                    <td><span class="statut ${a.statut}">${a.statut === 'en-cours' ? 'En cours' : a.statut === 'retourne' ? 'Retourné' : 'Perdu'}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-secondaire" title="Modifier">✏️</button>
-                        <button
+</body>
+</html>

@@ -153,21 +153,11 @@
     </style>
 </head>
 <body>
-    <!-- Vérification de connexion -->
+    <script src="js/api.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const connecte = localStorage.getItem('connecte');
-            if (!connecte || connecte !== 'oui') {
-                alert('Veuillez vous connecter d\'abord');
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // Afficher le nom de l'utilisateur
-            const utilisateur = JSON.parse(localStorage.getItem('utilisateur') || '{}');
-            if (utilisateur.prenom && utilisateur.nom) {
-                document.getElementById('nom-utilisateur').textContent = utilisateur.prenom + ' ' + utilisateur.nom;
-            }
+            if (!requireAuth()) return;
+            afficherUtilisateur();
         });
     </script>
 
@@ -198,8 +188,8 @@
             <form id="form-bien">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="reference">Référence *</label>
-                        <input type="text" id="reference" name="reference" placeholder="ex: EQ-001" required>
+                        <label for="reference">Référence / N° de série</label>
+                        <input type="text" id="reference" name="reference" placeholder="ex: EQ-001">
                     </div>
                     <div class="form-group">
                         <label for="nom">Nom du bien *</label>
@@ -223,19 +213,20 @@
                             <option>Neuf</option>
                             <option>Bon</option>
                             <option>Moyen</option>
-                            <option>Mauvais</option>
+                            <option>Dégradé</option>
+                            <option>Hors service</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="valeur">Valeur (FCFA) *</label>
-                        <input type="number" id="valeur" name="valeur" min="0" step="1" required>
+                        <input type="number" id="valeur" name="valeur" min="0" step="1" value="0">
                     </div>
                     <div class="form-group">
                         <label for="date_acquisition">Date d'acquisition *</label>
                         <input type="date" id="date_acquisition" name="date_acquisition" required>
                     </div>
                     <div class="form-group full-width">
-                        <label for="localisation">Localisation *</label>
+                        <label for="localisation">Emplacement *</label>
                         <input type="text" id="localisation" name="localisation" placeholder="ex: Bureau A10 / Salle de réunion" required>
                     </div>
                     <div class="form-group full-width">
@@ -262,53 +253,46 @@
     <script>
         const form = document.getElementById('form-bien');
         const messageDiv = document.getElementById('message');
+        const submitBtn = form.querySelector('button[type="submit"]');
 
-        function deconnecter() {
-            localStorage.removeItem('connecte');
-            localStorage.removeItem('utilisateur');
-            window.location.href = 'login.html';
-        }
-
-        // Charger les biens depuis localStorage ou initialiser
-        function getBiens() {
-            return JSON.parse(localStorage.getItem('biens')) || [];
-        }
-
-        function sauvegarderBien(nouveauBien) {
-            const biens = getBiens();
-            biens.push(nouveauBien);
-            localStorage.setItem('biens', JSON.stringify(biens));
-        }
-
-        // Soumission du formulaire
-        form.addEventListener('submit', function(e) {
+        // Soumission du formulaire -> API
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
             messageDiv.style.display = 'none';
+            messageDiv.className = 'message';
 
-            const nouveauBien = {
-                id: Date.now(),
-                reference: document.getElementById('reference').value,
-                designation: document.getElementById('nom').value,
+            const payload = {
+                designation: document.getElementById('nom').value.trim(),
                 categorie: document.getElementById('categorie').value,
                 etat: document.getElementById('etat').value,
-                valeur: parseInt(document.getElementById('valeur').value).toLocaleString('fr-FR') + ' FCFA',
-                date_achat: document.getElementById('date_acquisition').value,
-                localisation: document.getElementById('localisation').value,
-                description: document.getElementById('description').value
+                valeur: Number(document.getElementById('valeur').value) || 0,
+                date_achat: document.getElementById('date_acquisition').value || null,
+                emplacement: document.getElementById('localisation').value.trim(),
+                description: document.getElementById('description').value.trim() || null,
+                numero_serie: document.getElementById('reference').value.trim() || null
             };
 
-            // Enregistrer en mémoire locale
-            sauvegarderBien(nouveauBien);
+            submitBtn.disabled = true;
+            const res = await SGPE.post('biens', '/biens', payload);
+            submitBtn.disabled = false;
 
-            // Message de succès
-            messageDiv.textContent = "✅ Bien enregistré avec succès ! Redirection vers l'inventaire...";
-            messageDiv.className = "message succes";
-
-            // Réinitialiser et rediriger
-            setTimeout(() => {
-                form.reset();
-                window.location.href = 'inventaire.html';
-            }, 1500);
+            if (res.ok) {
+                messageDiv.textContent = "✅ Bien enregistré avec succès ! Redirection vers l'inventaire...";
+                messageDiv.className = "message succes";
+                setTimeout(() => {
+                    form.reset();
+                    window.location.href = 'inventaire.html';
+                }, 1500);
+            } else {
+                let msg = 'Erreur lors de l\'enregistrement.';
+                if (res.data && res.data.errors) {
+                    msg = Object.values(res.data.errors).flat().join(' ');
+                } else if (res.data && res.data.message) {
+                    msg = res.data.message;
+                }
+                messageDiv.textContent = '❌ ' + msg;
+                messageDiv.className = "message erreur";
+            }
         });
     </script>
 </body>

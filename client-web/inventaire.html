@@ -90,27 +90,6 @@
     </style>
 </head>
 <body>
-    <!-- Vérification de connexion -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const connecte = localStorage.getItem('connecte');
-            if (!connecte || connecte !== 'oui') {
-                alert('Veuillez vous connecter d\'abord');
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // Afficher le nom de l'utilisateur
-            const utilisateur = JSON.parse(localStorage.getItem('utilisateur') || '{}');
-            if (utilisateur.prenom && utilisateur.nom) {
-                document.getElementById('nom-utilisateur').textContent = utilisateur.prenom + ' ' + utilisateur.nom;
-            }
-
-            // Charger les biens
-            chargerBiens();
-        });
-    </script>
-
     <!-- Barre latérale -->
     <aside class="sidebar">
         <div class="logo">SGPE</div>
@@ -154,7 +133,8 @@
                 <option>Neuf</option>
                 <option>Bon</option>
                 <option>Moyen</option>
-                <option>Mauvais</option>
+                <option>Dégradé</option>
+                <option>Hors service</option>
             </select>
         </div>
 
@@ -179,26 +159,27 @@
         </div>
     </main>
 
+    <script src="js/api.js"></script>
     <script>
-        // Données de démonstration par défaut
-        const DEMO_BIENS = [
-            { reference: 'EQ-024', designation: 'Ordinateur portable', categorie: 'Matériel informatique', etat: 'Bon', valeur: '850 000 FCFA', localisation: 'Bureau A10' },
-            { reference: 'MB-018', designation: 'Table de réunion', categorie: 'Mobilier', etat: 'Bon', valeur: '150 000 FCFA', localisation: 'Salle de réunion' },
-            { reference: 'VE-007', designation: 'Véhicule de service', categorie: 'Véhicule', etat: 'Bon', valeur: '8 500 000 FCFA', localisation: 'Parc automobile' },
-            { reference: 'IM-003', designation: 'Imprimante', categorie: 'Équipement', etat: 'Moyen', valeur: '250 000 FCFA', localisation: 'Service Comptabilité' },
-        ];
+        let tousBiens = [];
 
-        // Déconnexion
-        function deconnecter() {
-            localStorage.removeItem('connecte');
-            localStorage.removeItem('utilisateur');
-            window.location.href = 'login.html';
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!requireAuth()) return;
+            afficherUtilisateur();
+            await chargerBiens();
+        });
+
+        // Charger les biens depuis l'API
+        async function chargerBiens() {
+            const res = await SGPE.get('biens', '/biens', { per_page: 100 });
+            tousBiens = (res.ok && res.data && res.data.data) ? res.data.data : [];
+            filtrerBiens();
         }
 
-        // Récupérer la liste des biens
-        function getBiens() {
-            const stockees = localStorage.getItem('biens');
-            return stockees ? JSON.parse(stockees) : DEMO_BIENS;
+        function classeEtat(etat) {
+            if (etat === 'Neuf' || etat === 'Bon') return 'bon';
+            if (etat === 'Moyen') return 'moyen';
+            return 'mauvais';
         }
 
         // Afficher les biens dans le tableau
@@ -210,15 +191,14 @@
             }
             tbody.innerHTML = liste.map(b => `
                 <tr>
-                    <td><strong>${b.reference || ''}</strong></td>
-                    <td>${b.designation || b.nom || ''}</td>
-                    <td>${b.categorie || ''}</td>
-                    <td><span class="etat ${b.etat === 'Bon' ? 'bon' : b.etat === 'Moyen' ? 'moyen' : 'mauvais'}">${b.etat || ''}</span></td>
-                    <td>${b.valeur || ''}</td>
-                    <td>${b.localisation || ''}</td>
+                    <td><strong>${echapper(b.numero_serie || ('N°' + b.id))}</strong></td>
+                    <td>${echapper(b.designation)}</td>
+                    <td>${echapper(b.categorie)}</td>
+                    <td><span class="etat ${classeEtat(b.etat)}">${echapper(b.etat)}</span></td>
+                    <td>${formaterFCFA(b.valeur)}</td>
+                    <td>${echapper(b.emplacement || '—')}</td>
                     <td class="actions-ligne">
-                        <a href="fiche-bien.html">📄 Fiche</a>
-                        <a href="ajouter-bien.html">✏️ Modifier</a>
+                        <a href="fiche-bien.html?id=${b.id}">📄 Fiche</a>
                     </td>
                 </tr>
             `).join('');
@@ -229,11 +209,10 @@
             const recherche = document.getElementById('recherche').value.toLowerCase();
             const categorie = document.getElementById('filtre-categorie').value;
             const etat = document.getElementById('filtre-etat').value;
-            const tousBiens = getBiens();
 
             const resultat = tousBiens.filter(b => {
-                const correspondRecherche = !recherche || 
-                    (b.reference && b.reference.toLowerCase().includes(recherche)) ||
+                const correspondRecherche = !recherche ||
+                    (b.numero_serie && b.numero_serie.toLowerCase().includes(recherche)) ||
                     (b.designation && b.designation.toLowerCase().includes(recherche));
                 const correspondCategorie = !categorie || b.categorie === categorie;
                 const correspondEtat = !etat || b.etat === etat;
@@ -241,11 +220,6 @@
             });
 
             afficherBiens(resultat);
-        }
-
-        // Charger les biens au démarrage
-        function chargerBiens() {
-            afficherBiens(getBiens());
         }
 
         // Événements des filtres

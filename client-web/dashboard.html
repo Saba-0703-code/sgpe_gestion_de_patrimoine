@@ -209,69 +209,52 @@
         </div>
     </main>
 
-    <script src="js/demo-data.js"></script>
+    <script src="js/api.js"></script>
     <script>
-        // Vérifier si l'utilisateur est connecté
-        document.addEventListener('DOMContentLoaded', function() {
-            const connecte = localStorage.getItem('connecte');
-            if (!connecte || connecte !== 'oui') {
-                alert('Veuillez vous connecter d\'abord');
-                window.location.href = 'login.html';
-                return;
-            }
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!requireAuth()) return;
+            afficherUtilisateur();
 
-            // Afficher le nom de l'utilisateur
-            const utilisateur = JSON.parse(localStorage.getItem('utilisateur') || '{}');
-            if (utilisateur.prenom && utilisateur.nom) {
-                document.getElementById('nom-utilisateur').textContent = utilisateur.prenom + ' ' + utilisateur.nom;
-            }
+            const res = await SGPE.get('biens', '/biens', { per_page: 100 });
+            const biens = (res.ok && res.data && res.data.data) ? res.data.data : [];
 
-            // Charger les statistiques
-            if (typeof DEMO_DATA !== 'undefined') {
-                document.getElementById('stat-total').textContent = DEMO_DATA.statistiques.total_biens;
-                document.getElementById('stat-valeur').textContent = DEMO_DATA.statistiques.valeur_totale;
-                document.getElementById('stat-bon').textContent = DEMO_DATA.statistiques.en_bonne_etat;
-                document.getElementById('stat-reviser').textContent = DEMO_DATA.statistiques.a_reviser;
+            const valeurTotale = biens.reduce((s, b) => s + (Number(b.valeur) || 0), 0);
+            const enBonEtat = biens.filter(b => ['Neuf', 'Bon'].includes(b.etat)).length;
+            const aReviser = biens.filter(b => ['Moyen', 'Dégradé', 'Hors service'].includes(b.etat)).length;
 
-                // Charger les derniers biens
-                afficherDerniersBiens();
-            }
+            document.getElementById('stat-total').textContent = biens.length;
+            document.getElementById('stat-valeur').textContent = formaterFCFA(valeurTotale);
+            document.getElementById('stat-bon').textContent = enBonEtat;
+            document.getElementById('stat-reviser').textContent = aReviser;
+
+            afficherDerniersBiens(biens);
         });
 
         // Afficher les 5 derniers biens
-        function afficherDerniersBiens() {
-            const biens = JSON.parse(localStorage.getItem('biens')) || DEMO_DATA.biens;
+        function afficherDerniersBiens(biens) {
             const tbody = document.getElementById('table-body');
-            
-            // Prendre les 5 derniers éléments
-            const derniers = biens.slice(-5).reverse();
-            
-            tbody.innerHTML = '';
-            derniers.forEach((bien, index) => {
-                // Déterminer la classe de l'état
+            const derniers = biens.slice(0, 5);
+
+            if (derniers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#999;padding:20px;">Aucun bien enregistré</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = derniers.map(bien => {
                 let etatClasse = 'bon';
                 if (bien.etat === 'Moyen') etatClasse = 'moyen';
-                if (bien.etat === 'Dégradé' || bien.etat === 'Mauvais') etatClasse = 'mauvais';
+                if (bien.etat === 'Dégradé' || bien.etat === 'Hors service') etatClasse = 'mauvais';
+                const ref = bien.numero_serie || 'N°' + bien.id;
 
-                // Générer une référence
-                const ref = 'EQ-' + String(100 + index).padStart(3, '0');
-                
-                tbody.innerHTML += `
+                return `
                     <tr>
-                        <td><strong>${ref}</strong></td>
-                        <td>${bien.designation}</td>
-                        <td>${bien.categorie}</td>
-                        <td><span class="etat ${etatClasse}">${bien.etat}</span></td>
+                        <td><strong>${echapper(ref)}</strong></td>
+                        <td>${echapper(bien.designation)}</td>
+                        <td>${echapper(bien.categorie)}</td>
+                        <td><span class="etat ${etatClasse}">${echapper(bien.etat)}</span></td>
                     </tr>
                 `;
-            });
-        }
-
-        // Fonction de déconnexion
-        function deconnecter() {
-            localStorage.removeItem('connecte');
-            localStorage.removeItem('utilisateur');
-            window.location.href = 'login.html';
+            }).join('');
         }
     </script>
 </body>
