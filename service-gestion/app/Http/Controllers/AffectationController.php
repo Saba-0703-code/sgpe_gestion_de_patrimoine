@@ -37,7 +37,7 @@ class AffectationController extends Controller
     {
         try {
             $validated = $request->validate([
-                'bien_id' => 'nullable|string|max:255',
+                'bien_id' => 'nullable|integer|min:1',
                 'nom_bien' => 'required|string|max:255',
                 'service_destinataire' => 'required|string|max:255',
                 'responsable' => 'required|string|max:255',
@@ -76,7 +76,7 @@ class AffectationController extends Controller
             $affectation = Affectation::findOrFail($id);
             
             $validated = $request->validate([
-                'bien_id' => 'nullable|string|max:255',
+                'bien_id' => 'nullable|integer|min:1',
                 'nom_bien' => 'sometimes|required|string|max:255',
                 'service_destinataire' => 'sometimes|required|string|max:255',
                 'responsable' => 'sometimes|required|string|max:255',

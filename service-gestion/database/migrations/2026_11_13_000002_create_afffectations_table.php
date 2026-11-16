@@ -10,13 +10,14 @@ return new class extends Migration
     {
         Schema::create('affectations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('bien_id');
-            $table->string('nom_responsable');
-            $table->string('service_departement');
-            $table->text('motif')->nullable();
+            $table->unsignedBigInteger('bien_id')->nullable();
+            $table->string('nom_bien');
+            $table->string('service_destinataire');
+            $table->string('responsable');
             $table->date('date_affectation');
-            $table->date('date_retour')->nullable();
-            $table->enum('statut', ['en_cours', 'retourne', 'perdu'])->default('en_cours');
+            $table->date('date_fin')->nullable();
+            $table->text('motif')->nullable();
+            $table->string('etat')->default('En cours');
             $table->timestamps();
         });
     }
