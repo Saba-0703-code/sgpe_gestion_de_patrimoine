@@ -226,7 +226,7 @@ Ces chiffres se mettent à jour automatiquement après chaque modification.
 En cas de difficulté ou pour signaler un problème :
 - **Documentation technique :** Voir `fiche_technique.md`
 - **Analyse du besoin :** Voir `analyse_besoin.md`
-- **Conception UML :** Voir `conception_uml.md`
+- **Conception UML :** Voir [Conception_et_Modelisation_UML.md](Conception_et_Modelisation_UML.md)
 
 ---
 

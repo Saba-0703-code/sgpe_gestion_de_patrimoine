@@ -88,7 +88,7 @@ gestion_patrimoine/
 │   └── .env
 ├── docs/                     # Documentation du projet
 │   ├── analyse_besoin.md
-│   ├── conception_uml.md
+│   ├── Conception_et_Modelisation_UML.md
 │   ├── fiche_technique.md
 │   └── guide_utilisation.md
 ├── docker-compose.yml        # Configuration Docker
@@ -315,7 +315,7 @@ docker-compose down -v
 ## 📚 Documentation complémentaire
 
 - 📄 **Analyse du besoin** → `docs/analyse_besoin.md`
-- 📄 **Conception UML** → `docs/conception_uml.md`
+- 📄 **Conception UML** → [`docs/Conception_et_Modelisation_UML.md`](docs/Conception_et_Modelisation_UML.md)
 - 📄 **Fiche technique** → `docs/fiche_technique.md`
 - 📄 **Guide d'utilisation** → `docs/guide_utilisation.md`
 - 📄 **Déploiement Render** → `docs/deploiement-render.md` + `render.yaml`
@@ -346,7 +346,11 @@ docker-compose down -v
 
 ## 👤 Auteur
 
-**Saba Felicio** — Projet de fin d'études
+<p align="center">
+  <img src="docs/media/auteur.png" alt="Photo de Saba Felicio" width="180">
+  <br>
+**Saba Felicio**
+</p>
 
 ---
 
