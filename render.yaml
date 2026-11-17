@@ -29,7 +29,7 @@ services:
       - key: APP_DEBUG
         value: "false"
       - key: APP_KEY
-        generateValue: true
+        value: base64:8ZNYptYD710Yv19Th53LAcCnvz3P/x8KGD2cZyw2+/A=
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_HOST
@@ -77,7 +77,7 @@ services:
       - key: APP_DEBUG
         value: "false"
       - key: APP_KEY
-        generateValue: true
+        value: base64:8ZNYptYD710Yv19Th53LAcCnvz3P/x8KGD2cZyw2+/A=
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_HOST
@@ -125,7 +125,7 @@ services:
       - key: APP_DEBUG
         value: "false"
       - key: APP_KEY
-        generateValue: true
+        value: base64:8ZNYptYD710Yv19Th53LAcCnvz3P/x8KGD2cZyw2+/A=
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_HOST
