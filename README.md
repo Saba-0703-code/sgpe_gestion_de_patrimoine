@@ -348,9 +348,9 @@ docker-compose down -v
 
 <p align="center">
   <img src="docs/media/auteur.png" alt="Photo de Saba Felicio" width="180">
-  <br>
-**Saba Felicio**
 </p>
+
+             ***Saba Felicio*** 
 
 ---
 
