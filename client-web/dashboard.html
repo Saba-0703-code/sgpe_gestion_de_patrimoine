@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -7,9 +7,9 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         :root {
-            --primaire: #00a896;
-            --foncee: #008080;
-            --claire: #e6f7f5;
+            --primaire: #17C9B2;
+            --foncee: #1D84F5;
+            --claire: #E7FAF8;
             --texte: #334443;
             --gris: #f4f6f6;
         }
@@ -231,7 +231,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="js/api.js"></script>
     <script>
-        const COULEURS = ['#00a896', '#008080', '#4db6ac', '#26a69a', '#80cbc4', '#b2dfdb', '#00695c', '#004d40', '#ffa726', '#ef5350'];
+        const COULEURS = ['#1D84F5', '#17C9B2', '#59D2F3', '#0E8F80', '#1565C0', '#7FDBE8', '#14B8A6', '#3B9DF0', '#D6F3FA', '#115E59'];
         const graphs = {};
 
         document.addEventListener('DOMContentLoaded', async function() {
@@ -303,7 +303,7 @@
                 type: 'bar',
                 data: {
                     labels: vCats,
-                    datasets: [{ label: 'Valeur (FCFA)', data: vCats.map(c => valCat[c]), backgroundColor: '#008080', borderRadius: 6 }]
+                    datasets: [{ label: 'Valeur (FCFA)', data: vCats.map(c => valCat[c]), backgroundColor: '#1D84F5', borderRadius: 6 }]
                 },
                 options: {
                     indexAxis: 'y', responsive: true, maintainAspectRatio: false,
