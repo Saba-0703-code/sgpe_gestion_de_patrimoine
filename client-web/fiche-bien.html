@@ -173,6 +173,7 @@
     </style>
 </head>
 <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="js/api.js"></script>
     <script>
         let bienActuel = null;
@@ -218,6 +219,22 @@
             document.getElementById('f-date').textContent = formaterDate(b.date_achat);
             document.getElementById('f-loc').textContent = b.emplacement || '—';
             document.getElementById('f-desc').innerHTML = echapper(b.description || 'Aucune description.');
+            genererQR(b.id);
+        }
+
+        // Génère le QR code pointant vers l'URL absolue de cette fiche
+        function genererQR(bienId) {
+            const conteneur = document.getElementById('qr-code');
+            conteneur.innerHTML = '';
+            const url = location.origin + '/fiche-bien.html?id=' + bienId;
+            new QRCode(conteneur, {
+                text: url,
+                width: 140,
+                height: 140,
+                colorDark: '#008080',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
         }
 
         async function chargerHistorique(bienId) {
@@ -314,6 +331,10 @@
                     <span class="info-label">Localisation :</span>
                     <span class="info-value" id="f-loc">Bureau A10</span>
                 </div>
+
+                <h2 style="margin-top: 25px;">Code QR</h2>
+                <div id="qr-code" style="display:flex;justify-content:center;padding:10px 0;"></div>
+                <p style="font-size:12px;color:#888;text-align:center;margin-top:5px;">Scannez pour ouvrir cette fiche</p>
             </div>
 
             <!-- Colonne droite : Onglets détaillés -->
