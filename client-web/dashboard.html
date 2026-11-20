@@ -140,6 +140,8 @@
             .grille-cartes { grid-template-columns: 1fr; }
         }
     </style>
+    <link rel="stylesheet" href="css/sombre.css">
+    <script src="js/theme.js"></script>
 </head>
 <body>
 
@@ -240,6 +242,7 @@
 
             const res = await SGPE.get('biens', '/biens', { per_page: 100 });
             const biens = (res.ok && res.data && res.data.data) ? res.data.data : [];
+            window._sgpeBiens = biens;
 
             const valeurTotale = biens.reduce((s, b) => s + (Number(b.valeur) || 0), 0);
             const enBonEtat = biens.filter(b => ['Neuf', 'Bon'].includes(b.etat)).length;

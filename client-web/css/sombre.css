@@ -1,0 +1,133 @@
+/* ============================================================
+   SGPE — Mode sombre
+   Activé via <html class="sombre"> (localStorage 'sgpe-theme')
+   ============================================================ */
+
+html.sombre {
+    --s-bg: #0B1220;
+    --s-surface: #131C2E;
+    --s-surface-2: #1B2740;
+    --s-border: #2A3A5C;
+    --s-texte: #E6EDF7;
+    --s-texte-doux: #9FB0CC;
+    --s-input-bg: #0F1829;
+}
+
+html.sombre body {
+    background: var(--s-bg) !important;
+    color: var(--s-texte);
+}
+
+/* --- Sidebar --- */
+html.sombre .sidebar {
+    background: var(--s-surface) !important;
+    border-right-color: var(--s-border) !important;
+}
+html.sombre .sidebar .logo {
+    color: #59D2F3 !important;
+    border-bottom-color: var(--s-border) !important;
+}
+html.sombre .sidebar nav a {
+    color: var(--s-texte-doux) !important;
+}
+html.sombre .sidebar nav a.actif {
+    background: var(--s-surface-2) !important;
+    color: #17C9B2 !important;
+    border-left-color: #17C9B2 !important;
+}
+html.sombre .sidebar nav a:hover:not(.actif) {
+    background: var(--s-surface-2) !important;
+}
+
+/* --- Conteneurs / cartes --- */
+html.sombre .carte,
+html.sombre .boite,
+html.sombre .filtres,
+html.sombre .login-card,
+html.sombre .info-demo,
+html.sombre .form-box,
+html.sombre .panel,
+html.sombre .section,
+html.sombre .carte-stat,
+html.sombre .bloc {
+    background: var(--s-surface) !important;
+    border-color: var(--s-border) !important;
+    color: var(--s-texte);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+/* --- Titres & textes --- */
+html.sombre .entete h1,
+html.sombre h1, html.sombre h2, html.sombre h3,
+html.sombre .boite h3, html.sombre .carte h3 {
+    color: var(--s-texte) !important;
+}
+html.sombre p, html.sombre span, html.sombre label,
+html.sombre .etiquette, html.sombre .sous-titre,
+html.sombre td, html.sombre th {
+    color: var(--s-texte-doux);
+}
+html.sombre strong, html.sombre b { color: var(--s-texte); }
+
+/* --- Tableaux --- */
+html.sombre table th, html.sombre table td {
+    border-bottom-color: var(--s-border) !important;
+}
+html.sombre table th { color: var(--s-texte-doux) !important; }
+html.sombre table td { color: var(--s-texte); }
+
+/* --- Badges d'état (pastels -> versions sombres) --- */
+html.sombre .etat.bon { background: #0F3D24 !important; color: #4ADE80 !important; }
+html.sombre .etat.moyen { background: #4A2E0A !important; color: #FBBF24 !important; }
+html.sombre .etat.mauvais { background: #4A1520 !important; color: #F87171 !important; }
+
+/* --- Boutons --- */
+html.sombre .btn-secondaire {
+    background: var(--s-surface-2) !important;
+    color: var(--s-texte) !important;
+}
+html.sombre .btn-secondaire:hover { background: var(--s-border) !important; }
+html.sombre input[type="button"].btn-secondaire,
+html.sombre button.btn-secondaire { color: var(--s-texte) !important; }
+
+/* --- Champs de formulaire --- */
+html.sombre input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+html.sombre select,
+html.sombre textarea {
+    background: var(--s-input-bg) !important;
+    border-color: var(--s-border) !important;
+    color: var(--s-texte) !important;
+}
+html.sombre input::placeholder, html.sombre textarea::placeholder {
+    color: #5A6B8C !important;
+}
+html.sombre input:focus, html.sombre select:focus, html.sombre textarea:focus {
+    border-color: #1D84F5 !important;
+    box-shadow: 0 0 0 3px rgba(29, 132, 245, 0.25) !important;
+}
+html.sombre option { background: var(--s-surface); color: var(--s-texte); }
+
+/* --- Alertes --- */
+html.sombre .alert.error { background: #3A1520 !important; color: #FCA5A5 !important; border-color: #7F2D3E !important; }
+html.sombre .alert.success { background: #0F3D24 !important; color: #86EFAC !important; border-color: #166534 !important; }
+html.sombre .alert.info { background: #0C2D4D !important; color: #7DD3FC !important; border-color: #1D4ED8 !important; }
+
+/* --- Login --- */
+html.sombre .illustration {
+    background: linear-gradient(135deg, #0B1220 0%, #131C2E 100%) !important;
+}
+html.sombre .illustration-content h2 { color: #59D2F3 !important; }
+html.sombre .illustration-content p { color: var(--s-texte-doux) !important; }
+html.sombre .login-card h2 { color: var(--s-texte) !important; }
+html.sombre .form-group label { color: var(--s-texte) !important; }
+html.sombre .info-demo { color: var(--s-texte-doux) !important; }
+html.sombre .info-demo strong { color: #17C9B2 !important; }
+html.sombre .logo-section h1 { color: #1D84F5 !important; }
+html.sombre body { background: var(--s-bg) !important; }
+
+/* --- Divers --- */
+html.sombre hr { border-color: var(--s-border); }
+html.sombre .qr-box, html.sombre .qr-container { background: #fff; border-radius: 8px; padding: 10px; display: inline-block; }
+html.sombre ::-webkit-scrollbar { width: 10px; }
+html.sombre ::-webkit-scrollbar-track { background: var(--s-bg); }
+html.sombre ::-webkit-scrollbar-thumb { background: var(--s-border); border-radius: 5px; }
